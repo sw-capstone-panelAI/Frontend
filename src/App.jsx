@@ -12,6 +12,7 @@ function App() {
           <Route path={routes.home} element={<MainPage />} />
           <Route path={routes.search} element={<SearchingPage />} />
           <Route path={routes.test} element={<TestPage />} />
+          <Route path={routes.result} element={<ResultPage />} />
         </Routes>
       </Router>
     </>
