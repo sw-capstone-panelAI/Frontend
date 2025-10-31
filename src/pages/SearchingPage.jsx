@@ -1,6 +1,5 @@
 import { useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
-import axios from "axios";
 // 검색 중 로딩 화면을 표시하는 페이지 컴포넌트입니다.
 
 function SearchingPage() {
