@@ -2,9 +2,9 @@
 
 function SearchingPage() {
   return (
-    <div className="min-h-screen bg-background flex flex-col">
-      hello Wraaold
-    </div>
+    <>
+      <div>Loding...</div>
+    </>
   );
 }
 
