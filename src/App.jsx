@@ -3,6 +3,7 @@ import routes from "@utils/constants/routes";
 import MainPage from "./pages/MainPage";
 import SearchingPage from "./pages/SearchingPage";
 import TestPage from "./pages/TestPage";
+import ResultPage from "./pages/ResultPage";
 
 function App() {
   return (
