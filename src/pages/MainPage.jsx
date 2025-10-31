@@ -2,7 +2,7 @@ import { Logo } from "@common/bar/Logo";
 
 import { Search } from "lucide-react";
 import HeaderBar from "@common/bar/HeaderBar";
-import { SearchInput } from "@components/SerachInput";
+import { SearchInput } from "@components/SearchInput";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -16,23 +16,15 @@ function MainPage() {
 
     console.log(query); // 서버에 입력 데이터 전송
     navigate("/search", { state: { query: `${query}` } }); // 서칭 페이지로 넘어감 (로딩 화면)
-
-    //---------------------실제 서버 전송 버전---------------------------//
-    // !!!!!!axos 라이브러리 설치 필요!!!!!!
-    // try{
-    //   const res = await axios.post("http://localhost:5000/search", {query});
-    //   navigate("/search");
-    // } catch (err){
-    //   console.error(err);
-    //   alert("서버 요청 충 오류가 발생했습니다!");
-    // }
   }
 
   return (
     <>
       <div className="min-h-screen w-screen bg-gradient-to-br from-gray-50 to-gray-100 flex flex-col">
         {/* Header */}
-        <HeaderBar />
+        <header className="p-5 flex items-center gap-3">
+          <HeaderBar />
+        </header>
 
         {/* Main Content */}
         <main className="mx-100 my-50 flex-1 flex flex-col items-center text-center">
