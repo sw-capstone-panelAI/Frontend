@@ -15,7 +15,7 @@ function MainPage() {
     if (!query.trim()) return; // 빈 값 전송 방지
 
     console.log(query); // 서버에 입력 데이터 전송
-    navigate("/search"); // 서칭 페이지로 넘어감 (로딩 화면)
+    navigate("/search", { state: { query: `${query}` } }); // 서칭 페이지로 넘어감 (로딩 화면)
 
     //---------------------실제 서버 전송 버전---------------------------//
     // !!!!!!axos 라이브러리 설치 필요!!!!!!
