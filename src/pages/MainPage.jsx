@@ -1,15 +1,14 @@
-import { Logo } from "@common/bar/logo";
+import { Logo } from "@common/bar/Logo";
 
 import { Search } from "lucide-react";
+import HeaderBar from "@common/bar/HeaderBar";
 
 function MainPage() {
   return (
     <>
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex flex-col">
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex-col">
         {/* Header */}
-        <header className="p-5 flex items-center gap-3">
-          <Logo />
-        </header>
+        <HeaderBar />
 
         {/* Main Content */}
         <main className="mx-100 flex-1 flex flex-col items-center justify-center text-center">
