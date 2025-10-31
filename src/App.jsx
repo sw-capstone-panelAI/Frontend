@@ -10,6 +10,7 @@ function App() {
         <Routes>
           <Route path={routes.home} element={<MainPage />} />
           <Route path={routes.search} element={<SearchingPage />} />
+          <Route path={routes.result} element={<ResultPage />} />
         </Routes>
       </Router>
     </>
