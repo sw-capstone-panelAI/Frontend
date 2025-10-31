@@ -1,4 +1,4 @@
-import { Logo } from "../components/Logo";
+import { Logo } from "@common/bar/logo";
 
 import { Search } from "lucide-react";
 
