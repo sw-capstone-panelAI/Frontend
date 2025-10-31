@@ -1,9 +1,15 @@
 import { Sparkles } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 export function Logo() {
+  const navigate = useNavigate();
+
   return (
     <>
-      <div className={"flex items-center gap-3"}>
+      <div
+        className={"flex items-center gap-3 left-0"}
+        onClick={() => navigate("/")}
+      >
         {/* 아이콘 컨테이너 */}
         <div className="relative">
           {/* Sparkles 아이콘 - 반짝이는 별 모양 */}
@@ -21,7 +27,7 @@ export function Logo() {
       */}
         <span
           className={
-            "text-3xl font-bold bg-gradient-to-r from-indigo-500 to-purple-600 bg-clip-text text-transparent"
+            "text-3xl font-bold bg-gradient-to-r from-indigo-500 to-purple-600 bg-clip-text text-transparent hover:bg-gradient-to-l"
           }
         >
           PanelFinder
