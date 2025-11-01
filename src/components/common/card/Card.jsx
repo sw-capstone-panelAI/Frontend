@@ -4,10 +4,10 @@ import { MapPin, Briefcase, DollarSign, Car } from "lucide-react";
 export function PanelCard({ panel, onClick, selected }) {
   return (
     <div
-      className={`p-4 rounded-lg cursor-pointer border ${
+      className={`p-4 my-1 rounded-lg cursor-pointer border ${
         selected
           ? "border-indigo-500 bg-indigo-50"
-          : "border-transparent hover:bg-gray-100"
+          : "border-gray-300 bg-gray-50 hover:bg-gray-200"
       }`}
       onClick={onClick}
     >

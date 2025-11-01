@@ -4,7 +4,7 @@ import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";
 
 function GenderDistributionChart({ stats }) {
   return (
-    <div className="bg-card border border-border rounded-lg p-6">
+    <div className="bg-card bg-white border border-gray-300 rounded-lg p-6">
       <h3 className="mb-4">[translate:성별 분포]</h3>
       <ResponsiveContainer width="100%" height={250}>
         <PieChart>

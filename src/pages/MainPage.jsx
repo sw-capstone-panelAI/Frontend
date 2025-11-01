@@ -20,7 +20,7 @@ function MainPage() {
 
   return (
     <>
-      <div className="min-h-screen w-screen bg-gradient-to-br from-gray-50 to-gray-100 flex flex-col">
+      <div className="min-h-screen w-screen bg-gradient-to-br from-cyan-100 to-pink-200 flex flex-col">
         {/* Header */}
         <header className="p-5 flex items-center gap-3">
           <HeaderBar />
