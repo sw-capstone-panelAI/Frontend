@@ -6,7 +6,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 
 import AgeDistributionChart from "../components/AgeDistributionChart";
 import GenderDistributionChart from "../components/GenderDistributionChart";
-import OccupationDistributionChart from "../components/OccupationDistributionChart";
+import IncomeDistributionChart from "../components/IncomeDistributionChart";
 import ResidenceDistributionChart from "../components/ResidenceDistributionChart";
 import Dropdown from "@components/Dropdown";
 
@@ -123,15 +123,7 @@ export default function ResultPage() {
               <GenderDistributionChart panels={filteredPanels} />
 
               {/* 직업 그래프 */}
-              <OccupationDistributionChart
-                occupationDistribution={[
-                  { name: "개발자", value: 35 },
-                  { name: "디자이너", value: 25 },
-                  { name: "마케터", value: 15 },
-                  { name: "영업", value: 15 },
-                  { name: "기타", value: 10 },
-                ]}
-              />
+              <IncomeDistributionChart panels={filteredPanels} />
 
               {/* 거주지 그래프 */}
               <ResidenceDistributionChart panels={filteredPanels} />
