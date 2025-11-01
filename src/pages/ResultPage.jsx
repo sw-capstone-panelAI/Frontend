@@ -116,14 +116,8 @@ export default function ResultPage() {
             </div>
 
             <div className="grid grid-cols-2 gap-4 px-6 pb-10">
-              <AgeDistributionChart
-                ageDistribution={[
-                  { name: "20대", value: 40 },
-                  { name: "30대", value: 30 },
-                  { name: "40대", value: 20 },
-                  { name: "50대", value: 10 },
-                ]}
-              />
+              {/* 연령 그래프 */}
+              <AgeDistributionChart panels={filteredPanels} />
 
               {/* 성비 그래프 */}
               <GenderDistributionChart panels={filteredPanels} />
