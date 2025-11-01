@@ -1,78 +1,65 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { PanelCard, PanelDetailView } from "../components/common/card/Card";
 import HeaderBar from "@common/bar/HeaderBar";
 import { SearchInput } from "@components/SearchInput";
-import { useLocation } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
-
-import { MapPin, Briefcase, DollarSign, Car } from "lucide-react";
-import { Button } from "../components/common/button/Button";
+import { useLocation, useNavigate } from "react-router-dom";
 
 import AgeDistributionChart from "../components/AgeDistributionChart";
 import GenderDistributionChart from "../components/GenderDistributionChart";
-
-import OccupationDistributionChart from "../components/OccupationDistributionChart";
+import IncomeDistributionChart from "../components/IncomeDistributionChart";
 import ResidenceDistributionChart from "../components/ResidenceDistributionChart";
+import Dropdown from "@components/Dropdown";
 
 export default function ResultPage() {
-  /*---------------백엔드에서 받아올 목업 데이터 관련---------------------*/
-  //location 객체 생성(페이지간 데이터 전송을 위한 객체? 정도로 생각하면 될듯)
   const location = useLocation();
-  // searchingPage에서 query와 panels 데이터를 받아옴
-  const { query, panels } = location.state || {};
+  const { query, result } = location.state || {};
+  const { panels, words } = result;
 
-  /*---------------쿼리 재입력을 위한 함수----------------------------*/
+  // 페이지 전환시 데이터 전송 처리를 위한 객체
   const navigate = useNavigate();
-  const [newQuery, setQuery] = useState("");
-  // 검색 함수(인풋 입력 후 서버 전송)
-  function onSearch() {
-    if (!query.trim()) return; // 빈 값 전송 방지
 
-    console.log(newQuery); // 서버에 입력 데이터 전송
-    navigate("/search", { state: { query: `${newQuery}` } }); // 서칭 페이지로 넘어감 (로딩 화면)
+  // 상단 바 검색창 새쿼리 입력시 재검색
+  const [newQuery, setQuery] = useState("");
+  function onSearch() {
+    if (!query?.trim()) return;
+    navigate("/search", { state: { query: `${newQuery}` } });
   }
 
-  /*---------------패널 관련----------------------------*/
+  // 상세 패널 선택 여부 상태관리
   const [selectedPanel, setSelectedPanel] = useState(null);
 
-  const ageDistribution = [
-    { name: "20대", value: 40 },
-    { name: "30대", value: 30 },
-    { name: "40대", value: 20 },
-    { name: "50대", value: 10 },
-  ];
+  // 헤더 실제 높이에 맞게 바꿔 주세요 (px 단위). 예: 88px
+  const headerHeight = "88px";
 
-  const genderStats = { male: 55, female: 45 };
+  //신뢰도 필터 (0 ~ 100), 신뢰도 필터링 값 변경시 리렌더링
+  const [trustfilter, setTrustfilter] = useState(0);
+  const [filteredPanels, setFilteredPanels] = useState(panels);
+  useEffect(() => {
+    setSelectedPanel(null); // 필터 값 선택될 경우 상세패널 컴포넌트 null
 
-  const occupationDistribution = [
-    { name: "개발자", value: 35 },
-    { name: "디자이너", value: 25 },
-    { name: "마케터", value: 15 },
-    { name: "영업", value: 15 },
-    { name: "기타", value: 10 },
-  ];
+    const newPanels = panels
+      .filter((p) => p.reliability >= trustfilter)
+      .sort((a, b) => {
+        return b.reliability - a.reliability;
+      });
+    setFilteredPanels(newPanels);
 
-  const residenceDistribution = [
-    { name: "서울", value: 50 },
-    { name: "부산", value: 20 },
-    { name: "대구", value: 10 },
-    { name: "인천", value: 10 },
-    { name: "광주", value: 10 },
-  ];
+    console.log(panels);
+  }, [trustfilter, panels]);
 
   return (
-    <div className="min-h-screen w-screen bg-gradient-to-br from-gray-50 to-gray-100 flex flex-col">
-      {/*헤더바 영역*/}
-      <header className="p-3 bg-indigo-100">
+    // ✅ 전체 배경은 루트 컨테이너에
+    <div className="min-h-screen flex flex-col bg-teal-50">
+      {/* 헤더 */}
+      <header
+        className="sticky top-0 z-30 p-3 bg-indigo-100 border-b-3 border-violet-500 rounded-b-2xl"
+        style={{ height: headerHeight }} // (선택) 고정 높이 쓰면 계산이 더 명확
+      >
         <HeaderBar>
-          <div
-            className="
-            w-320 p-1 mr-20 flex text-xl font-bold items-center
-            bg-gradient-to-r from-indigo-500 to-100 rounded-xl"
-          >
-            <p className="p-1 py-2 mr-2 bg-blue-100 content-center rounded-xl">
+          <div className="w-320 p-1 mr-20 flex text-xl font-bold items-center bg-gradient-to-r from-fuchsia-400 to-100 rounded-xl">
+            <p className="p-1 py-2 mr-2 bg-slate-50 border-2 border-indigo-400 content-center rounded-xl">
               입력 쿼리
-            </p>{" "}
+            </p>
             {query}
           </div>
           <SearchInput
@@ -83,12 +70,36 @@ export default function ResultPage() {
           />
         </HeaderBar>
       </header>
-      {/*메인 영역*/}
-      <main>
-        <div className="flex gap-6 p-6 min-h-screen">
-          {/* 좌측: 패널 리스트 */}
-          <div className="w-80">
-            {panels.map((panel) => (
+
+      {/* 본문 */}
+      {/* ✅ 헤더 높이를 CSS 변수로 내려 sticky와 height 계산에 재사용 */}
+      <main className="flex-1" style={{ ["--header-h"]: headerHeight }}>
+        <div className="flex gap-6 p-6">
+          {/* 좌측: 패널 리스트 (독립 스크롤) */}
+          <section
+            className="
+              w-80 shrink-0 pr-2
+              sticky
+              top-[var(--header-h)]               /* 헤더 바로 아래에 붙음 */
+              h-[calc(100vh-var(--header-h)-1.5rem)]  /* 화면높이 - 헤더 - p-6의 위쪽 패딩(=1.5rem) */
+              overflow-y-auto
+              bg-transparent
+            "
+          >
+            {/* 드롭다운 박스 신뢰도 필터링 기능 */}
+            <Dropdown
+              options={[
+                { label: "100%", value: "100" },
+                { label: "75%", value: "75" },
+                { label: "50%", value: "50" },
+                { label: "25%", value: "25" },
+                { label: "ALL", value: "0" },
+              ]}
+              value={trustfilter}
+              onChange={setTrustfilter}
+              placeholder="필터링 %를 선택하세요"
+            />
+            {filteredPanels.map((panel) => (
               <PanelCard
                 key={panel.id}
                 panel={panel}
@@ -96,26 +107,26 @@ export default function ResultPage() {
                 onClick={() => setSelectedPanel(panel)}
               />
             ))}
-          </div>
+          </section>
 
-          {/* 우측: 패널 상세보기 */}
-          <section
-            className="flex-1 pl-6 flex flex-col overflow-y-auto"
-            style={{ maxHeight: "calc(100vh - 48px)" }}
-          >
-            <div className="flex-1 border-l border-gray-300">
+          {/* 우측: 상세 (페이지 전체 스크롤에 따라 함께 스크롤) */}
+          <section className="flex-1 pl-6 border-l border-gray-400">
+            <div>
               <PanelDetailView selectedPanel={selectedPanel} />
             </div>
 
-            <div className="mt-8 space-y-8 min-h-[700px]">
-              <AgeDistributionChart ageDistribution={ageDistribution} />
-              <GenderDistributionChart stats={genderStats} />
-              <OccupationDistributionChart
-                occupationDistribution={occupationDistribution}
-              />
-              <ResidenceDistributionChart
-                residenceDistribution={residenceDistribution}
-              />
+            <div className="grid grid-cols-2 gap-4 px-6 pb-10">
+              {/* 연령 그래프 */}
+              <AgeDistributionChart panels={filteredPanels} />
+
+              {/* 성비 그래프 */}
+              <GenderDistributionChart panels={filteredPanels} />
+
+              {/* 직업 그래프 */}
+              <IncomeDistributionChart panels={filteredPanels} />
+
+              {/* 거주지 그래프 */}
+              <ResidenceDistributionChart panels={filteredPanels} />
             </div>
           </section>
         </div>

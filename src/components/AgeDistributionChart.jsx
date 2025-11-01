@@ -1,35 +1,76 @@
-import React from "react";
-import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";
+// AgeDistributionChart.jsx
+import React, { useMemo } from "react";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  Cell,
+} from "recharts";
+import agePng from "@assets/age.png";
 
-const COLORS = ["#8b5cf6", "#06b6d4", "#f472b6", "#f59e42", "#2dd4bf"];
+const COLORS = [
+  "#c3cdfcff", // 10대
+  "#aebcffff", // 20대
+  "#8ba0fdff", // 30대
+  "#6c87ffff", // 40대
+  "#5271faff", // 50대
+  "#2e54ffff", // 60대
+  "#234bffff", // 70대
+  "#1741f8ff", // 80대
+  "#002fffff", // 90대+
+];
 
-function AgeDistributionChart({ ageDistribution }) {
+function AgeDistributionChart({ panels = [] }) {
+  // 연령대 버킷 계산 (10대~90대+)
+  const data = useMemo(() => {
+    const buckets = [
+      { name: "10대", value: 0 },
+      { name: "20대", value: 0 },
+      { name: "30대", value: 0 },
+      { name: "40대", value: 0 },
+      { name: "50대", value: 0 },
+      { name: "60대", value: 0 },
+      { name: "70대", value: 0 },
+      { name: "80대", value: 0 },
+      { name: "90대+", value: 0 },
+    ];
+
+    for (const p of panels) {
+      const a = Number(p?.age);
+      if (!Number.isFinite(a)) continue; // 숫자 아님 → 스킵
+      const decade = Math.floor(a / 10); // 0~9, 10~19 → 1, 20대 → 2, ...
+      let idx;
+      if (decade <= 1) idx = 0; // 0~19세 → 10대 버킷에 포함
+      else if (decade >= 9) idx = 8; // 90세 이상 → 90대+
+      else idx = decade - 1; // 20대~80대
+      buckets[idx].value += 1;
+    }
+    return buckets;
+  }, [panels]);
+
   return (
-    <div className="bg-card border border-border rounded-lg p-6">
-      <h3 className="mb-4">[translate:연령대 분포]</h3>
-      <ResponsiveContainer width="100%" height={250}>
-        <PieChart>
-          <Pie
-            data={ageDistribution}
-            cx="50%"
-            cy="50%"
-            labelLine={false}
-            label={({ name, percent }) =>
-              `${name} ${(percent * 100).toFixed(0)}%`
-            }
-            outerRadius={80}
-            fill="#8884d8"
-            dataKey="value"
-          >
-            {ageDistribution.map((entry, index) => (
-              <Cell
-                key={`cell-${index}`}
-                fill={COLORS[index % COLORS.length]}
-              />
-            ))}
-          </Pie>
+    <div className="flex bg-white border border-gray-300 rounded-lg p-6">
+      <h3 className="mb-4 py-10 flex flex-col items-center text-center space-y-2">
+        <img src={agePng} height="150px" width="200px" alt="연령대 분포" />
+        <span>[연령대 분포]</span>
+      </h3>
+
+      <ResponsiveContainer width="100%" height={270}>
+        <BarChart data={data}>
+          <CartesianGrid strokeDasharray="3 3" opacity={0.1} />
+          <XAxis dataKey="name" />
+          <YAxis allowDecimals={false} />
           <Tooltip />
-        </PieChart>
+          <Bar dataKey="value">
+            {data.map((_, i) => (
+              <Cell key={`cell-${i}`} fill={COLORS[i % COLORS.length]} />
+            ))}
+          </Bar>
+        </BarChart>
       </ResponsiveContainer>
     </div>
   );
