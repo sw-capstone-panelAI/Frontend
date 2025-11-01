@@ -19,8 +19,10 @@ export default function ResultPage() {
   //location 객체 생성(페이지간 데이터 전송을 위한 객체? 정도로 생각하면 될듯)
   const location = useLocation();
   // searchingPage에서 query와 panels 데이터를 받아옴
-  const { query, panels } = location.state || {};
+  const { query, result } = location.state || {};
+  const { panels, words } = result; // result에는(패널, 추천어, 공통 특성 ...등 모든 요청 데이터들이 들어있음)
 
+  console.log(words);
   /*---------------쿼리 재입력을 위한 함수----------------------------*/
   const navigate = useNavigate();
   const [newQuery, setQuery] = useState("");
@@ -61,7 +63,7 @@ export default function ResultPage() {
   ];
 
   return (
-    <div className="min-h-screen w-screen bg-gradient-to-br from-gray-50 to-gray-100 flex flex-col">
+    <div className="overflow-y-auto bg-gradient-to-br from-gray-50 to-gray-100 flex flex-col">
       {/*헤더바 영역*/}
       <header className="p-3 bg-indigo-100">
         <HeaderBar>
@@ -85,9 +87,9 @@ export default function ResultPage() {
       </header>
       {/*메인 영역*/}
       <main>
-        <div className="flex gap-6 p-6 min-h-screen">
+        <div className="w-screen flex gap-6 p-6 max-h-screen bg-blue-50">
           {/* 좌측: 패널 리스트 */}
-          <div className="w-80">
+          <section className="w-80 overflow-y-auto">
             {panels.map((panel) => (
               <PanelCard
                 key={panel.id}
@@ -96,18 +98,18 @@ export default function ResultPage() {
                 onClick={() => setSelectedPanel(panel)}
               />
             ))}
-          </div>
+          </section>
 
           {/* 우측: 패널 상세보기 */}
           <section
-            className="flex-1 pl-6 flex flex-col overflow-y-auto"
+            className="flex-1 pl-6 flex flex-col"
             style={{ maxHeight: "calc(100vh - 48px)" }}
           >
             <div className="flex-1 border-l border-gray-300">
               <PanelDetailView selectedPanel={selectedPanel} />
             </div>
 
-            <div className="mt-8 space-y-8 min-h-[700px]">
+            <div className="grid grid-cols-2 gap-3">
               <AgeDistributionChart ageDistribution={ageDistribution} />
               <GenderDistributionChart stats={genderStats} />
               <OccupationDistributionChart

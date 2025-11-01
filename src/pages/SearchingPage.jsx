@@ -17,7 +17,7 @@ function SearchingPage() {
         const res = await axios.post("http://localhost:5000/search", { query });
 
         // 백엔드 서버의 응답이 완료되면 result 페이지로 이동
-        navigate("/result", { state: { query, panels: res.data } });
+        navigate("/result", { state: { query, result: res.data } });
       } catch (err) {
         console.error("요청 실패: ", err);
       }
