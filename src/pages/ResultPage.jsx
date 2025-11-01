@@ -5,6 +5,15 @@ import { SearchInput } from "@components/SearchInput";
 import { useLocation } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 
+import { MapPin, Briefcase, DollarSign, Car } from "lucide-react";
+import { Button } from "../components/common/button/Button";
+
+import AgeDistributionChart from "../components/AgeDistributionChart";
+import GenderDistributionChart from "../components/GenderDistributionChart";
+
+import OccupationDistributionChart from "../components/OccupationDistributionChart";
+import ResidenceDistributionChart from "../components/ResidenceDistributionChart";
+
 export default function ResultPage() {
   /*---------------백엔드에서 받아올 목업 데이터 관련---------------------*/
   //location 객체 생성(페이지간 데이터 전송을 위한 객체? 정도로 생각하면 될듯)
@@ -25,6 +34,31 @@ export default function ResultPage() {
 
   /*---------------패널 관련----------------------------*/
   const [selectedPanel, setSelectedPanel] = useState(null);
+
+  const ageDistribution = [
+    { name: "20대", value: 40 },
+    { name: "30대", value: 30 },
+    { name: "40대", value: 20 },
+    { name: "50대", value: 10 },
+  ];
+
+  const genderStats = { male: 55, female: 45 };
+
+  const occupationDistribution = [
+    { name: "개발자", value: 35 },
+    { name: "디자이너", value: 25 },
+    { name: "마케터", value: 15 },
+    { name: "영업", value: 15 },
+    { name: "기타", value: 10 },
+  ];
+
+  const residenceDistribution = [
+    { name: "서울", value: 50 },
+    { name: "부산", value: 20 },
+    { name: "대구", value: 10 },
+    { name: "인천", value: 10 },
+    { name: "광주", value: 10 },
+  ];
 
   return (
     <div className="min-h-screen w-screen bg-gradient-to-br from-gray-50 to-gray-100 flex flex-col">
@@ -65,9 +99,25 @@ export default function ResultPage() {
           </div>
 
           {/* 우측: 패널 상세보기 */}
-          <div className="flex-1 border-l border-gray-300">
-            <PanelDetailView selectedPanel={selectedPanel} />
-          </div>
+          <section
+            className="flex-1 pl-6 flex flex-col overflow-y-auto"
+            style={{ maxHeight: "calc(100vh - 48px)" }}
+          >
+            <div className="flex-1 border-l border-gray-300">
+              <PanelDetailView selectedPanel={selectedPanel} />
+            </div>
+
+            <div className="mt-8 space-y-8 min-h-[700px]">
+              <AgeDistributionChart ageDistribution={ageDistribution} />
+              <GenderDistributionChart stats={genderStats} />
+              <OccupationDistributionChart
+                occupationDistribution={occupationDistribution}
+              />
+              <ResidenceDistributionChart
+                residenceDistribution={residenceDistribution}
+              />
+            </div>
+          </section>
         </div>
       </main>
     </div>
