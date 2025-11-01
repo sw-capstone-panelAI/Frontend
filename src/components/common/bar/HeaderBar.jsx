@@ -4,12 +4,12 @@ import { Logo } from "@common/bar/logo";
 // 네비게이션 바
 function HeaderBar({ children }) {
   return (
-    <header className="p-5 flex items-center gap-3">
-      <div className="flex space-x-30 left-0">
+    <div className="flex flex-row space-x-5">
+      <div className="w-60">
         <Logo />
-        {children}
       </div>
-    </header>
+      <div className="flex justify-items-start">{children}</div>
+    </div>
   );
 }
 
