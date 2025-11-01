@@ -6,10 +6,6 @@ import genderPng from "@assets/gender.png";
 function GenderDistributionChart({ panels }) {
   const maleCount = panels.filter((p) => p.gender === "남성").length;
   const femaleCount = panels.filter((p) => p.gender === "여성").length;
-  const total = maleCount + femaleCount;
-
-  const maleRatio = parseFloat(((maleCount / total) * 100).toFixed(2));
-  const femaleRatio = parseFloat((100 - maleRatio).toFixed(2));
 
   return (
     <div className="flex bg-card bg-white border border-gray-300 rounded-lg p-6">
@@ -20,8 +16,8 @@ function GenderDistributionChart({ panels }) {
         <PieChart>
           <Pie
             data={[
-              { name: "[남성]", value: maleRatio },
-              { name: "[여성]", value: femaleRatio },
+              { name: "[남성]", value: maleCount },
+              { name: "[여성]", value: femaleCount },
             ]}
             cx="50%"
             cy="50%"

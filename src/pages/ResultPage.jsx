@@ -122,6 +122,7 @@ export default function ResultPage() {
               {/* 성비 그래프 */}
               <GenderDistributionChart panels={filteredPanels} />
 
+              {/* 직업 그래프 */}
               <OccupationDistributionChart
                 occupationDistribution={[
                   { name: "개발자", value: 35 },
@@ -132,15 +133,8 @@ export default function ResultPage() {
                 ]}
               />
 
-              <ResidenceDistributionChart
-                residenceDistribution={[
-                  { name: "서울", value: 50 },
-                  { name: "부산", value: 20 },
-                  { name: "대구", value: 10 },
-                  { name: "인천", value: 10 },
-                  { name: "광주", value: 10 },
-                ]}
-              />
+              {/* 거주지 그래프 */}
+              <ResidenceDistributionChart panels={filteredPanels} />
             </div>
           </section>
         </div>

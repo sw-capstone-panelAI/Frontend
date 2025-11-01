@@ -13,15 +13,15 @@ import {
 import agePng from "@assets/age.png";
 
 const COLORS = [
-  "#8b5cf6", // 10대
-  "#06b6d4", // 20대
-  "#f472b6", // 30대
-  "#f59e42", // 40대
-  "#2dd4bf", // 50대
-  "#84cc16", // 60대
-  "#ef4444", // 70대
-  "#ec4899", // 80대
-  "#3b82f6", // 90대+
+  "#c3cdfcff", // 10대
+  "#aebcffff", // 20대
+  "#8ba0fdff", // 30대
+  "#6c87ffff", // 40대
+  "#5271faff", // 50대
+  "#2e54ffff", // 60대
+  "#234bffff", // 70대
+  "#1741f8ff", // 80대
+  "#002fffff", // 90대+
 ];
 
 function AgeDistributionChart({ panels = [] }) {
