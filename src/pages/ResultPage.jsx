@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { PanelCard, PanelDetailView } from "../components/common/card/Card";
 import HeaderBar from "@common/bar/HeaderBar";
 import { SearchInput } from "@components/SearchInput";
@@ -8,45 +8,44 @@ import AgeDistributionChart from "../components/AgeDistributionChart";
 import GenderDistributionChart from "../components/GenderDistributionChart";
 import OccupationDistributionChart from "../components/OccupationDistributionChart";
 import ResidenceDistributionChart from "../components/ResidenceDistributionChart";
+import Dropdown from "@components/Dropdown";
 
 export default function ResultPage() {
   const location = useLocation();
   const { query, result } = location.state || {};
   const { panels, words } = result;
+
+  // 페이지 전환시 데이터 전송 처리를 위한 객체
   const navigate = useNavigate();
 
+  // 상단 바 검색창 새쿼리 입력시 재검색
   const [newQuery, setQuery] = useState("");
   function onSearch() {
     if (!query?.trim()) return;
     navigate("/search", { state: { query: `${newQuery}` } });
   }
 
+  // 상세 패널 선택 여부 상태관리
   const [selectedPanel, setSelectedPanel] = useState(null);
-
-  const ageDistribution = [
-    { name: "20대", value: 40 },
-    { name: "30대", value: 30 },
-    { name: "40대", value: 20 },
-    { name: "50대", value: 10 },
-  ];
-  const genderStats = { male: 55, female: 45 };
-  const occupationDistribution = [
-    { name: "개발자", value: 35 },
-    { name: "디자이너", value: 25 },
-    { name: "마케터", value: 15 },
-    { name: "영업", value: 15 },
-    { name: "기타", value: 10 },
-  ];
-  const residenceDistribution = [
-    { name: "서울", value: 50 },
-    { name: "부산", value: 20 },
-    { name: "대구", value: 10 },
-    { name: "인천", value: 10 },
-    { name: "광주", value: 10 },
-  ];
 
   // 헤더 실제 높이에 맞게 바꿔 주세요 (px 단위). 예: 88px
   const headerHeight = "88px";
+
+  //신뢰도 필터 (0 ~ 100), 신뢰도 필터링 값 변경시 리렌더링
+  const [trustfilter, setTrustfilter] = useState(0);
+  const [filteredPanels, setFilteredPanels] = useState(panels);
+  useEffect(() => {
+    setSelectedPanel(null); // 필터 값 선택될 경우 상세패널 컴포넌트 null
+
+    const newPanels = panels
+      .filter((p) => p.reliability >= trustfilter)
+      .sort((a, b) => {
+        return b.reliability - a.reliability;
+      });
+    setFilteredPanels(newPanels);
+
+    console.log(panels);
+  }, [trustfilter, panels]);
 
   return (
     // ✅ 전체 배경은 루트 컨테이너에
@@ -87,7 +86,20 @@ export default function ResultPage() {
               bg-transparent
             "
           >
-            {panels.map((panel) => (
+            {/* 드롭다운 박스 신뢰도 필터링 기능 */}
+            <Dropdown
+              options={[
+                { label: "100%", value: "100" },
+                { label: "75%", value: "75" },
+                { label: "50%", value: "50" },
+                { label: "25%", value: "25" },
+                { label: "ALL", value: "0" },
+              ]}
+              value={trustfilter}
+              onChange={setTrustfilter}
+              placeholder="필터링 %를 선택하세요"
+            />
+            {filteredPanels.map((panel) => (
               <PanelCard
                 key={panel.id}
                 panel={panel}
@@ -104,13 +116,36 @@ export default function ResultPage() {
             </div>
 
             <div className="grid grid-cols-2 gap-4 px-6 pb-10">
-              <AgeDistributionChart ageDistribution={ageDistribution} />
-              <GenderDistributionChart stats={genderStats} />
-              <OccupationDistributionChart
-                occupationDistribution={occupationDistribution}
+              <AgeDistributionChart
+                ageDistribution={[
+                  { name: "20대", value: 40 },
+                  { name: "30대", value: 30 },
+                  { name: "40대", value: 20 },
+                  { name: "50대", value: 10 },
+                ]}
               />
+
+              {/* 성비 그래프 */}
+              <GenderDistributionChart panels={filteredPanels} />
+
+              <OccupationDistributionChart
+                occupationDistribution={[
+                  { name: "개발자", value: 35 },
+                  { name: "디자이너", value: 25 },
+                  { name: "마케터", value: 15 },
+                  { name: "영업", value: 15 },
+                  { name: "기타", value: 10 },
+                ]}
+              />
+
               <ResidenceDistributionChart
-                residenceDistribution={residenceDistribution}
+                residenceDistribution={[
+                  { name: "서울", value: 50 },
+                  { name: "부산", value: 20 },
+                  { name: "대구", value: 10 },
+                  { name: "인천", value: 10 },
+                  { name: "광주", value: 10 },
+                ]}
               />
             </div>
           </section>
