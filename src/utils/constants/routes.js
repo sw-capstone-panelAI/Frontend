@@ -11,6 +11,7 @@ const routes = {
   search: "/search",
   test: "/test",
   result: "/result",
+  related: "/related",
 };
 
 export default routes;

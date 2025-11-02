@@ -22,6 +22,7 @@ function IncomeDistributionChart({ panels }) {
     { label: "7000+", min: 7000, max: Infinity },
   ];
 
+  // 널 값 처리 안했음 ----- 널 값 있으면 아마 오류 듯?
   // ✅ 2. 각 구간별 인원 수 집계
   const distribution = incomeRanges.map((range) => {
     const count = panels.filter(

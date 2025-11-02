@@ -3,12 +3,13 @@ import { PanelCard, PanelDetailView } from "../components/common/card/Card";
 import HeaderBar from "@common/bar/HeaderBar";
 import { SearchInput } from "@components/SearchInput";
 import { useLocation, useNavigate } from "react-router-dom";
-
+import { Filter, Users, Network, SquaresIntersect } from "lucide-react";
 import AgeDistributionChart from "../components/AgeDistributionChart";
 import GenderDistributionChart from "../components/GenderDistributionChart";
 import IncomeDistributionChart from "../components/IncomeDistributionChart";
 import ResidenceDistributionChart from "../components/ResidenceDistributionChart";
 import Dropdown from "@components/Dropdown";
+import AiFeatButton from "@components/common/button/AiFeatButton";
 
 export default function ResultPage() {
   const location = useLocation();
@@ -49,7 +50,7 @@ export default function ResultPage() {
 
   return (
     // ✅ 전체 배경은 루트 컨테이너에
-    <div className="min-h-screen flex flex-col bg-teal-50">
+    <div className="min-h-screen flex flex-col bg-gradient-to-br from-teal-100 to-yellow-50">
       {/* 헤더 */}
       <header
         className="sticky top-0 z-30 p-3 bg-indigo-100 border-b-3 border-violet-500 rounded-b-2xl"
@@ -87,18 +88,35 @@ export default function ResultPage() {
             "
           >
             {/* 드롭다운 박스 신뢰도 필터링 기능 */}
-            <Dropdown
-              options={[
-                { label: "100%", value: "100" },
-                { label: "75%", value: "75" },
-                { label: "50%", value: "50" },
-                { label: "25%", value: "25" },
-                { label: "ALL", value: "0" },
-              ]}
-              value={trustfilter}
-              onChange={setTrustfilter}
-              placeholder="필터링 %를 선택하세요"
-            />
+            <div className=" font-bold pb-2 mb-3 border-b border-gray-400">
+              <div
+                className="
+              flex justify-between items-center w-full px-4 py-2
+              rounded-full border-2 border-fuchsia-900 bg-pink-100"
+              >
+                <div className="flex items-center gap-2">
+                  <Users className="w-7 h-7 text-primary" />
+                  <h2>검색 결과</h2>
+                </div>
+                <p className="text-right">{filteredPanels?.length ?? 0}명</p>
+              </div>
+              <div className="flex items-center mt-3 mb-1">
+                <Filter className="w-6 h-6 text-blue-700 mr-2" />
+                <p>신뢰도 필터 기능</p>
+              </div>
+              <Dropdown
+                options={[
+                  { label: "100%", value: "100" },
+                  { label: "75%", value: "75" },
+                  { label: "50%", value: "50" },
+                  { label: "25%", value: "25" },
+                  { label: "ALL", value: "0" },
+                ]}
+                value={trustfilter}
+                onChange={setTrustfilter}
+                placeholder="필터링 %를 선택하세요"
+              />
+            </div>
             {filteredPanels.map((panel) => (
               <PanelCard
                 key={panel.id}
@@ -111,8 +129,36 @@ export default function ResultPage() {
 
           {/* 우측: 상세 (페이지 전체 스크롤에 따라 함께 스크롤) */}
           <section className="flex-1 pl-6 border-l border-gray-400">
+            {/* 패널 카드 선택시 디테일 카드 */}
             <div>
               <PanelDetailView selectedPanel={selectedPanel} />
+            </div>
+
+            {/* AI 기능 버튼 */}
+            <div className=" grid grid-cols-2 gap-4 m-6">
+              {/* 패널 공통 특성 요약 버튼 */}
+              <AiFeatButton
+                title="연관 검색어"
+                content="현재 검색과 관련된 키워드를 시각화하여 보여드립니다. 새로운 검색 조합을 발견해보세요."
+                exeText="마인드맵으로 탐색하기"
+                color="indigo"
+                icon={<Network className="text-indigo-700" />}
+                // 페이지 전환
+                onClick={() => {
+                  navigate("/related");
+                }}
+              />
+
+              {/* 쿼리 추천 검색어 버튼 */}
+              <AiFeatButton
+                title="공통 특성 분석"
+                content="검색된 패널들의 공통적인 특성을 AI가 자동으로 분석합니다. 숨겨진 패턴을 발견하세요."
+                exeText="AI 분석 결과 보기"
+                color="blue"
+                icon={<SquaresIntersect className="text-blue-700" />}
+                // 페이지 전환
+                onClick={() => alert("공통 특성")}
+              />
             </div>
 
             <div className="grid grid-cols-2 gap-4 px-6 pb-10">
