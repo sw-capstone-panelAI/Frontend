@@ -4,7 +4,7 @@ import MainPage from "./pages/MainPage";
 import SearchingPage from "./pages/SearchingPage";
 import TestPage from "./pages/TestPage";
 import ResultPage from "./pages/ResultPage";
-import RelatedSerchPage from "@pages/RelatedSearchPage";
+import RelatedSearchPage from "@/pages/RelatedSearchPage";
 
 function App() {
   return (
@@ -15,7 +15,7 @@ function App() {
           <Route path={routes.search} element={<SearchingPage />} />
           <Route path={routes.test} element={<TestPage />} />
           <Route path={routes.result} element={<ResultPage />} />
-          <Route path={routes.related} element={<RelatedSerchPage />} />
+          <Route path={routes.resultex} element={<RelatedSearchPage />} />
         </Routes>
       </Router>
     </>
