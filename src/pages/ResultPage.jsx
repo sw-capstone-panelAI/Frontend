@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { PanelCard, PanelDetailView } from "../components/common/card/Card";
 import HeaderBar from "@common/bar/HeaderBar";
 import { SearchInput } from "@components/SearchInput";
+import routes from "@utils/constants/routes";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Filter, Users, Network, SquaresIntersect } from "lucide-react";
 import AgeDistributionChart from "../components/AgeDistributionChart";
@@ -145,7 +146,7 @@ export default function ResultPage() {
                 icon={<Network className="text-indigo-700" />}
                 // 페이지 전환
                 onClick={() => {
-                  navigate("/related");
+                  navigate(routes.resultex);
                 }}
               />
 
