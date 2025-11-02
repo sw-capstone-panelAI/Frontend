@@ -14,7 +14,9 @@ function SearchingPage() {
 
     async function fetchData() {
       try {
-        const res = await axios.post("http://localhost:5000/search", { query });
+        const res = await axios.post("http://localhost:5000/api/search", {
+          query,
+        });
 
         // 백엔드 서버의 응답이 완료되면 result 페이지로 이동
         navigate("/result", { state: { query, result: res.data } });

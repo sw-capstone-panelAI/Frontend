@@ -1,9 +1,7 @@
-import { Logo } from "@common/bar/Logo";
-
-import { Search } from "lucide-react";
 import HeaderBar from "@common/bar/HeaderBar";
 import { SearchInput } from "@components/SearchInput";
 import { useState } from "react";
+import routes from "@utils/constants/routes";
 import { useNavigate } from "react-router-dom";
 
 function MainPage() {
@@ -15,7 +13,7 @@ function MainPage() {
     if (!query.trim()) return; // 빈 값 전송 방지
 
     console.log(query); // 서버에 입력 데이터 전송
-    navigate("/search", { state: { query: `${query}` } }); // 서칭 페이지로 넘어감 (로딩 화면)
+    navigate(routes.search, { state: { query: `${query}` } }); // 서칭 페이지로 넘어감 (로딩 화면)
   }
 
   return (
