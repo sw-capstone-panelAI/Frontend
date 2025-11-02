@@ -1,14 +1,27 @@
 import React, { useEffect, useState } from "react";
-import { PanelCard, PanelDetailView } from "../components/common/card/Card";
+import {
+  PanelCard,
+  PanelDetailView,
+  TotalInfo,
+} from "@components/common/card/Card";
 import HeaderBar from "@common/bar/HeaderBar";
 import { SearchInput } from "@components/SearchInput";
 import routes from "@utils/constants/routes";
 import { useLocation, useNavigate } from "react-router-dom";
-import { Filter, Users, Network, SquaresIntersect } from "lucide-react";
-import AgeDistributionChart from "../components/AgeDistributionChart";
-import GenderDistributionChart from "../components/GenderDistributionChart";
-import IncomeDistributionChart from "../components/IncomeDistributionChart";
-import ResidenceDistributionChart from "../components/ResidenceDistributionChart";
+import {
+  Filter,
+  Users,
+  Network,
+  SquaresIntersect,
+  Sparkles,
+  UserRoundSearch,
+  ChartColumnBig,
+  BrainCircuit,
+} from "lucide-react";
+import AgeDistributionChart from "@components/AgeDistributionChart";
+import GenderDistributionChart from "@components/GenderDistributionChart";
+import IncomeDistributionChart from "@components/IncomeDistributionChart";
+import ResidenceDistributionChart from "@components/ResidenceDistributionChart";
 import Dropdown from "@components/Dropdown";
 import AiFeatButton from "@components/common/button/AiFeatButton";
 
@@ -24,7 +37,7 @@ export default function ResultPage() {
   const [newQuery, setQuery] = useState("");
   function onSearch() {
     if (!query?.trim()) return;
-    navigate("/search", { state: { query: `${newQuery}` } });
+    navigate("routes.search", { state: { query: `${newQuery}` } });
   }
 
   // 상세 패널 선택 여부 상태관리
@@ -130,13 +143,12 @@ export default function ResultPage() {
 
           {/* 우측: 상세 (페이지 전체 스크롤에 따라 함께 스크롤) */}
           <section className="flex-1 pl-6 border-l border-gray-400">
-            {/* 패널 카드 선택시 디테일 카드 */}
-            <div>
-              <PanelDetailView selectedPanel={selectedPanel} />
-            </div>
-
             {/* AI 기능 버튼 */}
-            <div className=" grid grid-cols-2 gap-4 m-6">
+            <p className="flex ml-7 mb-3 pt-2 font-bold text-2xl">
+              <BrainCircuit className="w-10 h-10 text-blue-700 mr-5" />
+              AI 활용 기능
+            </p>
+            <div className=" grid grid-cols-2 gap-4 m-6 mb-10">
               {/* 패널 공통 특성 요약 버튼 */}
               <AiFeatButton
                 title="연관 검색어"
@@ -162,6 +174,29 @@ export default function ResultPage() {
               />
             </div>
 
+            {/* 패널 카드 선택시 디테일 카드 */}
+            <p className="flex ml-7 mb-3 pt-2 font-bold text-2xl border-t border-gray-400">
+              <UserRoundSearch className="w-10 h-10 text-blue-700 mr-5" />
+              패널 상세 정보
+            </p>
+            <div className="mb-10">
+              <PanelDetailView selectedPanel={selectedPanel} />
+            </div>
+
+            {/* 전체 패널 요약 정보 */}
+            <p className="flex ml-7 mb-3 pt-2 font-bold text-2xl border-t border-gray-400">
+              <Users className="w-10 h-10 text-blue-700 mr-5" />
+              전체 패널 정보
+            </p>
+            <div className="mb-10">
+              <TotalInfo panels={filteredPanels} />
+            </div>
+
+            {/* 패널 그래프 시각화 */}
+            <p className=" flex ml-7 mb-3 pt-2 font-bold text-2xl border-t border-gray-400">
+              <ChartColumnBig className="w-10 h-10 text-blue-700 mr-5" />
+              패널 주요 정보 시각화
+            </p>
             <div className="grid grid-cols-2 gap-4 px-6 pb-10">
               {/* 연령 그래프 */}
               <AgeDistributionChart panels={filteredPanels} />

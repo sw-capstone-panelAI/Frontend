@@ -34,7 +34,7 @@ function IncomeDistributionChart({ panels }) {
   // ✅ 3. 차트 렌더링
   return (
     <div className="flex bg-white border border-gray-300 rounded-lg p-6">
-      <h3 className="mb-4 py-10 flex flex-col items-center text-center space-y-2">
+      <h3 className="pt-15 mb-4 flex flex-col items-center text-center space-y-2">
         <img src={incomePng} height="150px" width="200px" alt="연령대 분포" />
         <span>[소득 분포]</span>
       </h3>
