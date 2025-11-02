@@ -4,7 +4,6 @@ import HeaderBar from "@common/bar/HeaderBar";
 import { SearchInput } from "@components/SearchInput";
 import { useLocation } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
-
 import { MapPin, Briefcase, DollarSign, Car } from "lucide-react";
 import { Button } from "../components/common/button/Button";
 

@@ -112,9 +112,9 @@ export function PanelDetailView({ selectedPanel }) {
           </div>
 
           <div className="mt-4 pt-4 border-t border-gray-300">
-            <p className="text-sm text-gray-600">
-              설문 제공: {selectedPanel.surveyProvider}
-            </p>
+            {/*}<p className="text-sm text-gray-600">
+              설문 제공: {null}
+            </p> {*/}
           </div>
         </div>
       </div>
