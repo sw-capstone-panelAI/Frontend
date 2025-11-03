@@ -27,7 +27,7 @@ import AiFeatButton from "@components/common/button/AiFeatButton";
 
 export default function ResultPage() {
   const location = useLocation();
-  const { query, result } = location.state || {};
+  const { query: originalQuery, result } = location.state || {};
   const { panels, words } = result;
 
   // 페이지 전환시 데이터 전송 처리를 위한 객체
@@ -36,8 +36,8 @@ export default function ResultPage() {
   // 상단 바 검색창 새쿼리 입력시 재검색
   const [newQuery, setQuery] = useState("");
   function onSearch() {
-    if (!query?.trim()) return;
-    navigate("routes.search", { state: { query: `${newQuery}` } });
+    if (!originalQuery?.trim()) return;
+    navigate(routes.search, { state: { query: `${newQuery}` } });
   }
 
   // 상세 패널 선택 여부 상태관리
@@ -67,15 +67,18 @@ export default function ResultPage() {
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-teal-100 to-yellow-50">
       {/* 헤더 */}
       <header
-        className="sticky top-0 z-30 p-3 bg-indigo-100 border-b-3 border-violet-500 rounded-b-2xl"
-        style={{ height: headerHeight }} // (선택) 고정 높이 쓰면 계산이 더 명확
+        className="
+              sticky top-0 z-30 p-3 pb-4 
+              flex items-center gap-3 justify-between 
+              bg-indigo-100 border-b-3 border-violet-500 rounded-b-2xl
+              "
       >
         <HeaderBar>
-          <div className="w-320 p-1 mr-20 flex text-xl font-bold items-center bg-gradient-to-r from-fuchsia-400 to-100 rounded-xl">
-            <p className="p-1 py-2 mr-2 bg-slate-50 border-2 border-indigo-400 content-center rounded-xl">
+          <div className="w-320 p-1 mr-30 flex text-xl font-bold items-center bg-gradient-to-r from-fuchsia-400 to-100 rounded-xl">
+            <p className="p-1 py-2 mr-2 bg-slate-100 border-2 border-indigo-400 content-center rounded-xl">
               입력 쿼리
             </p>
-            {query}
+            {originalQuery}
           </div>
           <SearchInput
             value={newQuery}
@@ -142,7 +145,7 @@ export default function ResultPage() {
           </section>
 
           {/* 우측: 상세 (페이지 전체 스크롤에 따라 함께 스크롤) */}
-          <section className="flex-1 pl-6 border-l border-gray-400">
+          <section className="flex-1 p-6 border-l border-gray-400">
             {/* AI 기능 버튼 */}
             <p className="flex ml-7 mb-3 pt-2 font-bold text-2xl">
               <BrainCircuit className="w-10 h-10 text-blue-700 mr-5" />
@@ -158,7 +161,9 @@ export default function ResultPage() {
                 icon={<Network className="text-indigo-700" />}
                 // 페이지 전환
                 onClick={() => {
-                  navigate(routes.resultex);
+                  navigate(routes.resultex, {
+                    state: { query: `${originalQuery}` },
+                  });
                 }}
               />
 

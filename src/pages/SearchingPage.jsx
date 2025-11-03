@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Loader2, Database, Brain, CheckCircle } from "lucide-react";
 import HeaderBar from "@common/bar/HeaderBar";
 import { useLocation, useNavigate } from "react-router-dom";
+import routes from "@utils/constants/routes";
 import axios from "axios";
 
 // 인라인 프로그레스 바 컴포넌트
@@ -59,7 +60,7 @@ export default function SearchingPage() {
           // 검색 완료 후, 모든 단계 애니메이션 진행 후 결과페이지로 이동
           setTimeout(
             () => {
-              navigate("/result", { state: { query, result: res.data } });
+              navigate(routes.result, { state: { query, result: res.data } });
             },
             steps.reduce((t, s) => t + s.duration, 0)
           );
