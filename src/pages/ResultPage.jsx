@@ -154,7 +154,7 @@ export default function ResultPage() {
             <div className=" grid grid-cols-2 gap-4 m-6 mb-10">
               {/* 패널 공통 특성 요약 버튼 */}
               <AiFeatButton
-                title="연관 검색어"
+                title="추천 검색어"
                 content="현재 검색과 관련된 키워드를 시각화하여 보여드립니다. 새로운 검색 조합을 발견해보세요."
                 exeText="마인드맵으로 탐색하기"
                 color="indigo"
