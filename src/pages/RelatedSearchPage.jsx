@@ -31,11 +31,11 @@ function MindMapNode({
   isSelected = false,
 }) {
   const centerStyle =
-    "bg-indigo-600 text-white border-4 border-indigo-700 scale-110 shadow-lg shadow-indigo-500/50 font-bold text-base z-30";
+    "bg-emerald-600 text-white border-4 border-emerald-700 scale-110 shadow-lg shadow-emerald-500/50 font-bold text-base z-30";
   const selectedStyle =
-    "bg-indigo-100 text-indigo-800 border-indigo-600 hover:scale-[1.05] shadow-md z-20";
+    "bg-emerald-100 text-emerald-800 border-emerald-600 hover:scale-[1.05] shadow-md z-20";
   const defaultStyle =
-    "bg-white text-gray-700 border-gray-300 hover:border-indigo-600 hover:scale-[1.02] shadow-sm z-20";
+    "bg-white text-gray-700 border-gray-300 hover:border-emerald-600 hover:scale-[1.02] shadow-sm z-20";
 
   return (
     <div
@@ -73,7 +73,7 @@ const SimpleModal = ({ message, onClose }) => {
 
   return (
     <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in duration-300">
-      <div className="bg-white p-8 rounded-2xl shadow-2xl max-w-sm w-full animate-in zoom-in-95 duration-300 border-t-8 border-indigo-600">
+      <div className="bg-white p-8 rounded-2xl shadow-2xl max-w-sm w-full animate-in zoom-in-95 duration-300 border-t-8 border-emerald-600">
         <div className="flex justify-between items-start mb-4">
           <h3 className="text-2xl font-extrabold text-gray-900">
             {message.title}
@@ -85,14 +85,14 @@ const SimpleModal = ({ message, onClose }) => {
             <X className="w-5 h-5" />
           </button>
         </div>
-        <div className="bg-indigo-50/50 rounded-lg p-4 mb-6 border border-indigo-200">
+        <div className="bg-emerald-50/50 rounded-lg p-4 mb-6 border border-emerald-200">
           <p className="text-gray-700 whitespace-pre-line text-base font-medium">
             {message.body}
           </p>
         </div>
         <button
           onClick={handleConfirmClick}
-          className="w-full bg-indigo-100 text-indigo-800 py-2 px-4 rounded-lg font-bold text-lg border-2 border-indigo-600"
+          className="w-full bg-emerald-100 text-emerald-800 py-2 px-4 rounded-lg font-bold text-lg border-2 border-emerald-600"
         >
           확인
         </button>
@@ -176,7 +176,7 @@ export default function App() {
   return (
     <div
       className="
-      min-h-screen bg-gradient-to-br from-teal-100 to-yellow-50 
+      min-h-screen bg-gradient-to-br from-emerald-50 to-teal-50 
       flex flex-col font-sans"
     >
       {/* Header: 로고 오른쪽에 뒤로가기 버튼 */}
@@ -184,12 +184,12 @@ export default function App() {
         className="
         sticky top-0 z-30 p-3 pb-5 
         flex items-center gap-373 justify-between 
-        bg-indigo-100 border-b-3 border-violet-500 rounded-b-2xl"
+        bg-emerald-100 border-b-3 border-emerald-300 rounded-b-2xl"
       >
         <HeaderBar />
         <button
           onClick={handleBackClick}
-          className="p-2 rounded-lg hover:bg-gray-200 transition-colors flex items-center gap-1 text-gray-700"
+          className="p-2 rounded-lg hover:bg-emerald-200 transition-colors flex items-center gap-1 text-emerald-800"
           aria-label="뒤로가기"
         >
           <ArrowLeft className="w-5 h-5" />
@@ -203,21 +203,21 @@ export default function App() {
 
         {/* 원본 검색어 */}
         <section className="mb-6">
-          <h3 className="mb-1 text-gray-600 text-sm">원본 검색어</h3>
-          <p className="bg-white p-3 rounded-lg shadow-sm border border-gray-200 font-medium text-indigo-700">
+          <h3 className="mb-1 text-emerald-700 text-sm">원본 검색어</h3>
+          <p className="bg-white p-3 rounded-lg shadow-sm border border-emerald-200 font-medium text-emerald-700">
             {originalQuery}
           </p>
         </section>
 
         {/* 마인드맵 영역 */}
         <section
-          className="flex-1 relative bg-white rounded-xl shadow-2xl p-8 mb-6 border border-gray-100"
+          className="flex-1 relative bg-white rounded-xl shadow-2xl p-8 mb-6 border border-emerald-100"
           style={{ minHeight: 500 }}
         >
           {loading && relatedQueries.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full absolute inset-0 bg-white/80 backdrop-blur-sm">
-              <Loader2 className="w-12 h-12 animate-spin text-indigo-600" />
-              <p className="mt-3 text-gray-600">관련 키워드 분석 중...</p>
+              <Loader2 className="w-12 h-12 animate-spin text-emerald-600" />
+              <p className="mt-3 text-emerald-700">관련 키워드 분석 중...</p>
             </div>
           ) : relatedQueries.length === 0 ? (
             <div className="flex items-center justify-center h-full">
@@ -243,7 +243,7 @@ export default function App() {
                       y1={CENTER_POS.y}
                       x2={pos.x}
                       y2={pos.y}
-                      stroke={isSelected ? "#4f46e5" : "#a5b4fc"}
+                      stroke={isSelected ? "#059669" : "#a7f3d0"}
                       strokeWidth={isSelected ? 2.5 : 1}
                       strokeDasharray={isSelected ? "0" : "5 5"}
                       className="transition-all duration-300"
@@ -274,15 +274,15 @@ export default function App() {
         {/* 선택한 키워드 목록 */}
         {selectedQueries.length > 0 && (
           <section className="mb-6">
-            <p className="text-sm text-gray-600 mb-2">선택한 키워드:</p>
+            <p className="text-sm text-emerald-700 mb-2">선택한 키워드:</p>
             <div className="flex flex-wrap gap-2">
               {selectedQueries.map((q) => (
                 <div
                   key={q}
-                  className="px-3 py-1 bg-indigo-100 text-indigo-700 rounded-full cursor-pointer border-2 border-indigo-600 transition-colors text-sm font-medium"
+                  className="px-3 py-1 bg-emerald-100 text-emerald-700 rounded-full cursor-pointer border-2 border-emerald-600 transition-colors text-sm font-medium"
                   onClick={() => toggleQuery(q)}
                 >
-                  {q} <span className="text-indigo-500">✕</span>
+                  {q} <span className="text-emerald-500">✕</span>
                 </div>
               ))}
             </div>
@@ -290,25 +290,25 @@ export default function App() {
         )}
 
         {/* 추천 검색어 생성 및 실행 섹션 */}
-        <section className="bg-white border border-indigo-200 rounded-xl p-6 shadow-lg">
+        <section className="bg-white border border-emerald-200 rounded-xl p-6 shadow-lg">
           <div className="flex items-center gap-2 mb-4">
-            <Sparkles className="w-5 h-5 text-indigo-600" />
-            <h3 className="font-semibold text-gray-800">추천 검색어 생성</h3>
+            <Sparkles className="w-5 h-5 text-emerald-600" />
+            <h3 className="font-semibold text-emerald-800">추천 검색어 생성</h3>
           </div>
 
           {loading &&
           recommendedQuery === "" &&
           (selectedQueries.length > 0 || relatedQueries.length > 0) ? (
             <div className="flex items-center justify-center p-2">
-              <Loader2 className="w-6 h-6 animate-spin text-indigo-600 mr-2" />
-              <span className="text-indigo-600 font-medium">
+              <Loader2 className="w-6 h-6 animate-spin text-emerald-600 mr-2" />
+              <span className="text-emerald-600 font-medium">
                 추천 검색어 조합 중...
               </span>
             </div>
           ) : recommendedQuery ? (
             <>
-              <div className="bg-indigo-50/70 rounded-lg p-4 border border-indigo-100 mb-4 shadow-inner">
-                <p className="text-sm text-indigo-600 mb-1 font-medium">
+              <div className="bg-emerald-50/70 rounded-lg p-4 border border-emerald-100 mb-4 shadow-inner">
+                <p className="text-sm text-emerald-600 mb-1 font-medium">
                   생성된 검색어
                 </p>
                 <p className="text-xl font-bold text-gray-900 break-words">
@@ -318,13 +318,13 @@ export default function App() {
               <div className="flex gap-3">
                 <button
                   onClick={handleSearch}
-                  className="flex-1 bg-indigo-100 text-indigo-800 py-2 px-4 rounded-lg font-bold border-2 border-indigo-600 hover:bg-indigo-200"
+                  className="flex-1 bg-emerald-100 text-emerald-800 py-2 px-4 rounded-lg font-bold border-2 border-emerald-600 hover:bg-emerald-200"
                 >
                   이 검색어로 검색하기
                 </button>
                 <button
                   onClick={() => setRecommendedQuery("")}
-                  className="bg-indigo-100 text-indigo-800 py-2 px-4 rounded-lg font-bold border-2 border-indigo-600 hover:bg-indigo-200"
+                  className="bg-emerald-100 text-emerald-800 py-2 px-4 rounded-lg font-bold border-2 border-emerald-600 hover:bg-emerald-200"
                 >
                   다시 생성
                 </button>
@@ -340,7 +340,7 @@ export default function App() {
               <button
                 onClick={generateQuery}
                 disabled={loading}
-                className="w-full bg-indigo-100 text-indigo-800 py-2 px-4 rounded-lg font-bold flex items-center justify-center gap-2 border-2 border-indigo-600 hover:bg-indigo-200 disabled:opacity-50"
+                className="w-full bg-emerald-100 text-emerald-800 py-2 px-4 rounded-lg font-bold flex items-center justify-center gap-2 border-2 border-emerald-600 hover:bg-emerald-200 disabled:opacity-50"
               >
                 <Sparkles className="w-4 h-4" />
                 {selectedQueries.length > 0
