@@ -12,16 +12,17 @@ import {
 } from "recharts";
 import agePng from "@assets/age.png";
 
+// 🎨 연령대별 차트 색상: 초록색 계열의 부드러운 그라데이션
 const COLORS = [
-  "#aec3ffff", // 10대
-  "#aeaeffff", // 20대
-  "#ae8bffff", // 30대
-  "#ae6cffff", // 40대
-  "#ae52ffff", // 50대
-  "#ae2effff", // 60대
-  "#ae23ffff", // 70대
-  "#ae17ffff", // 80대
-  "#ae00ffff", // 90대+
+  "#d1fae5", // 10대 - emerald-100
+  "#a7f3d0", // 20대 - emerald-200
+  "#6ee7b7", // 30대 - emerald-300
+  "#34d399", // 40대 - emerald-400
+  "#10b981", // 50대 - emerald-500
+  "#059669", // 60대 - emerald-600
+  "#047857", // 70대 - emerald-700
+  "#065f46", // 80대 - emerald-800
+  "#064e3b", // 90대+ - emerald-900
 ];
 
 function AgeDistributionChart({ panels = [] }) {
@@ -53,25 +54,62 @@ function AgeDistributionChart({ panels = [] }) {
   }, [panels]);
 
   return (
-    <div className="flex bg-white border border-gray-300 rounded-lg p-6">
-      <h3 className="mb-4 py-10 flex flex-col items-center text-center space-y-2">
-        <img src={agePng} height="150px" width="200px" alt="연령대 분포" />
-        <span>[연령대 분포]</span>
-      </h3>
+    // 🎨 차트 컨테이너: 흰색 배경 + 초록색 테두리
+    <div className="flex flex-col bg-white border border-emerald-200 rounded-lg p-6 shadow-sm">
+      {/* 📊 차트 제목 및 아이콘 */}
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="flex items-center space-x-3">
+          <img
+            src={agePng}
+            height="60px"
+            width="60px"
+            alt="연령대 분포"
+            className="object-contain"
+          />
+          <span className="text-emerald-700 font-medium">[연령대 분포]</span>
+        </h3>
+      </div>
 
-      <ResponsiveContainer width="100%" height={270}>
-        <BarChart data={data}>
-          <CartesianGrid strokeDasharray="3 3" opacity={0.1} />
-          <XAxis dataKey="name" />
-          <YAxis allowDecimals={false} />
-          <Tooltip />
-          <Bar dataKey="value">
-            {data.map((_, i) => (
-              <Cell key={`cell-${i}`} fill={COLORS[i % COLORS.length]} />
-            ))}
-          </Bar>
-        </BarChart>
-      </ResponsiveContainer>
+      {/* 📈 반응형 차트 컨테이너 */}
+      <div className="flex justify-center">
+        <ResponsiveContainer width="100%" height={350}>
+          <BarChart
+            data={data}
+            margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
+          >
+            <CartesianGrid strokeDasharray="3 3" stroke="#d1fae5" />
+            <XAxis
+              dataKey="name"
+              tick={{ fill: "#047857" }}
+              axisLine={{ stroke: "#a7f3d0" }}
+            />
+            <YAxis
+              allowDecimals={false}
+              tick={{ fill: "#047857" }}
+              axisLine={{ stroke: "#a7f3d0" }}
+              label={{
+                value: "인원 (명)",
+                angle: -90,
+                position: "insideLeft",
+                fill: "#047857",
+              }}
+            />
+            <Tooltip
+              formatter={(value) => [`${value}명`, "인원"]}
+              contentStyle={{
+                backgroundColor: "white",
+                border: "1px solid #a7f3d0",
+                borderRadius: "8px",
+              }}
+            />
+            <Bar dataKey="value" radius={[8, 8, 0, 0]}>
+              {data.map((_, i) => (
+                <Cell key={`cell-${i}`} fill={COLORS[i % COLORS.length]} />
+              ))}
+            </Bar>
+          </BarChart>
+        </ResponsiveContainer>
+      </div>
     </div>
   );
 }

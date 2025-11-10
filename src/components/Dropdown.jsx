@@ -36,21 +36,25 @@ export default function Dropdown({
   }, [open]);
 
   return (
-    <div className="relative inline-block w-64 border-1 border-blue-300 rounded-lg">
-      {/* 버튼 */}
+    // 🎨 드롭다운 컨테이너: 초록색 테두리
+    <div className="relative inline-block w-64 border-1 border-emerald-300 rounded-lg">
+      {/* 🔘 드롭다운 버튼: 흰색 배경 + 초록색 포커스 */}
       <button
         ref={btnRef}
         type="button"
         onClick={() => setOpen((v) => !v)}
-        className="w-full h-11 px-3 rounded-lg border border-gray-300 bg-white text-left
+        className="w-full h-11 px-3 rounded-lg border border-emerald-200 bg-white text-left
                    flex items-center justify-between gap-2
-                   hover:bg-gray-50 focus:outline-none focus:ring-0 focus:border-blue-500"
+                   hover:bg-emerald-50 focus:outline-none focus:ring-0 focus:border-emerald-400"
       >
         <span className={selected ? "text-gray-800" : "text-gray-400"}>
           {selected ? selected.label : placeholder}
         </span>
+        {/* 🔽 화살표 아이콘 */}
         <svg
-          className={`w-4 h-4 transition-transform ${open ? "rotate-180" : ""}`}
+          className={`w-4 h-4 transition-transform text-emerald-500 ${
+            open ? "rotate-180" : ""
+          }`}
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
@@ -60,11 +64,11 @@ export default function Dropdown({
         </svg>
       </button>
 
-      {/* 메뉴 */}
+      {/* 📋 드롭다운 메뉴: 흰색 배경 + 초록색 hover */}
       {open && (
         <div
           ref={menuRef}
-          className="absolute z-50 mt-2 w-full rounded-lg border border-gray-200 bg-white shadow-md overflow-hidden"
+          className="absolute z-50 mt-2 w-full rounded-lg border border-emerald-200 bg-white shadow-md overflow-hidden"
         >
           <div className="max-h-60 overflow-auto py-1">
             {options.length === 0 && (
@@ -77,9 +81,9 @@ export default function Dropdown({
                   onChange?.(opt.value);
                   setOpen(false);
                 }}
-                className={`px-3 py-2 text-sm cursor-pointer hover:bg-blue-50 ${
+                className={`px-3 py-2 text-sm cursor-pointer hover:bg-emerald-50 ${
                   value === opt.value
-                    ? "text-blue-700 font-medium"
+                    ? "text-emerald-700 font-medium bg-emerald-50"
                     : "text-gray-800"
                 }`}
               >
