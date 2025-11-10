@@ -56,18 +56,18 @@ export default function ResultPage() {
   const [trustfilter, setTrustfilter] = useState(0);
   const [filteredPanels, setFilteredPanels] = useState(panels);
 
-  useEffect(() => {
-    setSelectedPanel(null);
+  // useEffect(() => {
+  //   setSelectedPanel(null);
 
-    const newPanels = panels
-      .filter((p) => p.reliability >= trustfilter)
-      .sort((a, b) => {
-        return b.reliability - a.reliability;
-      });
-    setFilteredPanels(newPanels);
+  //   const newPanels = panels
+  //     .filter((p) => p.reliability >= trustfilter)
+  //     .sort((a, b) => {
+  //       return b.reliability - a.reliability;
+  //     });
+  //   setFilteredPanels(newPanels);
 
-    console.log("필터링된 패널:", newPanels.length);
-  }, [trustfilter, panels]);
+  //   console.log("필터링된 패널:", newPanels.length);
+  // }, [trustfilter, panels]);
 
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-white via-emerald-50 to-teal-50">
@@ -142,7 +142,7 @@ export default function ResultPage() {
 
             {filteredPanels.map((panel) => (
               <PanelCard
-                key={panel.id}
+                key={panel["패널id"]}
                 panel={panel}
                 selected={selectedPanel?.id === panel.id}
                 onClick={() => setSelectedPanel(panel)}

@@ -25,7 +25,7 @@ export function PanelCard({ panel, onClick, selected }) {
       onClick={onClick}
     >
       {/* 🏷️ 패널 ID */}
-      <h3 className="font-semibold text-lg text-emerald-800">{panel.id}</h3>
+      <h3 className="font-semibold text-lg text-emerald-800">{panel.패널id}</h3>
 
       {/* 👤 나이 · 성별 */}
       <p className="text-sm text-gray-600">
