@@ -27,6 +27,13 @@ const displayValue = (value, defaultText = "무응답") => {
   return value;
 };
 
+// 직업명에서 괄호 부분 제거하는 헬퍼 함수
+const removeParentheses = (occupation) => {
+  if (!occupation) return occupation;
+  // "직업명 (설명)" 형태에서 괄호와 그 안의 내용 제거
+  return occupation.replace(/\s*\(.*?\)\s*/g, "").trim();
+};
+
 // 📋 패널 카드 컴포넌트 (좌측 리스트에 표시)
 export function PanelCard({ panel, onClick, selected }) {
   return (
@@ -47,9 +54,9 @@ export function PanelCard({ panel, onClick, selected }) {
         {displayValue(panel.gender, "성별 미상")}
       </p>
 
-      {/* 💼 직업 · 거주지 */}
+      {/* 💼 직업 · 거주지 (직업에서 괄호 제거) */}
       <p className="text-sm text-emerald-700">
-        {displayValue(panel.occupation, "직업 미상")} ·{" "}
+        {removeParentheses(displayValue(panel.occupation, "직업 미상"))} ·{" "}
         {displayValue(panel.residence, "거주지 미상")}
       </p>
 
@@ -90,6 +97,10 @@ export function PanelDetailView({ selectedPanel }) {
   };
 
   if (!selectedPanel) {
+    console.log(
+      "🧠 lifestylePatterns 데이터:",
+      selectedPanel?.lifestylePatterns
+    );
     return (
       <div className="h-full flex items-center font-bold justify-center text-emerald-600 bg-emerald-50 rounded-lg p-8 border-2 border-dashed border-emerald-300">
         👆 원하는 패널을 클릭하여 상세 정보를 확인하세요 👆
@@ -143,7 +154,7 @@ export function PanelDetailView({ selectedPanel }) {
               </div>
             </div>
 
-            {/* 💼 직업 */}
+            {/* 💼 직업 (괄호 포함된 전체 내용 표시) */}
             <div className="flex items-center gap-3 p-3 bg-emerald-50 rounded-lg border border-emerald-200">
               <Briefcase className="w-5 h-5 text-emerald-600" />
               <div>
@@ -154,11 +165,11 @@ export function PanelDetailView({ selectedPanel }) {
               </div>
             </div>
 
-            {/* 💰 소득 */}
+            {/* 💰 개인소득 */}
             <div className="flex items-center gap-3 p-3 bg-emerald-50 rounded-lg border border-emerald-200">
               <DollarSign className="w-5 h-5 text-emerald-600" />
               <div>
-                <p className="text-xs text-gray-600">소득</p>
+                <p className="text-xs text-gray-600">개인소득</p>
                 <p className="text-emerald-800 font-medium">
                   {displayValue(selectedPanel.personalIncome)}
                 </p>
@@ -405,6 +416,12 @@ export function PanelDetailView({ selectedPanel }) {
                               {displayValue(selectedPanel.education)}
                             </dd>
                           </div>
+                          <div className="flex justify-between">
+                            <dt className="text-gray-500">월 가구소득</dt>
+                            <dd className="font-medium">
+                              {displayValue(selectedPanel.householdIncome)}
+                            </dd>
+                          </div>
                         </dl>
                       </div>
 
@@ -528,6 +545,37 @@ export function PanelDetailView({ selectedPanel }) {
                               </span>
                             </span>
                           </div>
+
+                          {/* ✅ 생활 패턴 설문 응답 추가 */}
+                          {selectedPanel.lifestylePatterns &&
+                            Object.keys(selectedPanel.lifestylePatterns)
+                              .length > 0 && (
+                              <div className="mt-4 p-3 bg-white rounded-lg border border-sky-200">
+                                <p className="text-xs font-bold text-sky-700 mb-2">
+                                  📋 설문 기반 생활 패턴 응답
+                                </p>
+                                <div className="flex flex-col gap-1 text-xs text-gray-800 max-h-64 overflow-y-auto">
+                                  {Object.entries(
+                                    selectedPanel.lifestylePatterns
+                                  ).map(([label, value], idx) => (
+                                    <div
+                                      key={idx}
+                                      className="flex justify-between border-b border-sky-100 py-1"
+                                    >
+                                      <span className="text-gray-500 text-left">
+                                        {label}
+                                      </span>
+                                      <span className="font-medium text-gray-800 ml-2 text-right max-w-[60%]">
+                                        {value && value !== "무응답"
+                                          ? value
+                                          : "무응답"}
+                                      </span>
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+
                           {selectedPanel.smokingExperience &&
                             Array.isArray(selectedPanel.smokingExperience) &&
                             selectedPanel.smokingExperience.length > 0 && (
