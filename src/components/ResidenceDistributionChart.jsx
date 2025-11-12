@@ -109,7 +109,7 @@ function ResidenceDistributionChart({ panels = [] }) {
       if (Object.prototype.hasOwnProperty.call(counts, region)) {
         counts[region] += 1;
       } else {
-        //counts["기타/해외"] += 1;
+        //counts["기타/해외"] += 1; // 기타 해외
       }
     });
 

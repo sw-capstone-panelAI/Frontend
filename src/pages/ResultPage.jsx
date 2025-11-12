@@ -16,6 +16,7 @@ import {
   UserRoundSearch,
   ChartColumnBig,
   BrainCircuit,
+  Download,
 } from "lucide-react";
 import AgeDistributionChart from "@components/AgeDistributionChart";
 import GenderDistributionChart from "@components/GenderDistributionChart";
@@ -53,21 +54,66 @@ export default function ResultPage() {
 
   const headerHeight = "88px";
 
-  const [trustfilter, setTrustfilter] = useState(0);
+  const [trustfilter, setTrustfilter] = useState("0"); // 문자열로 변경
   const [filteredPanels, setFilteredPanels] = useState(panels);
 
   useEffect(() => {
     setSelectedPanel(null);
 
-    const newPanels = panels
-      .filter((p) => p.reliability >= trustfilter)
-      .sort((a, b) => {
-        return b.reliability - a.reliability;
-      });
+    const filterValue = parseInt(trustfilter);
+
+    let newPanels;
+
+    if (filterValue === 100) {
+      // 100%: 정확히 100점인 패널만
+      newPanels = panels.filter((p) => p.reliability === 100);
+    } else if (filterValue === 0) {
+      // ALL: 모든 패널
+      newPanels = panels;
+    } else {
+      // 25%, 50%, 75%: 이상인 패널들
+      newPanels = panels.filter((p) => p.reliability >= filterValue);
+    }
+
+    // 신뢰도 높은 순으로 정렬
+    newPanels = newPanels.sort((a, b) => b.reliability - a.reliability);
+
     setFilteredPanels(newPanels);
 
-    console.log("필터링된 패널:", newPanels.length);
+    console.log(`🔍 필터 적용: ${trustfilter}% → ${newPanels.length}개 패널`);
   }, [trustfilter, panels]);
+
+  // CSV 다운로드 함수
+  const handleDownloadCSV = async () => {
+    try {
+      const response = await fetch("http://localhost:5000/api/export-csv", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ panels: filteredPanels }),
+      });
+
+      if (!response.ok) {
+        throw new Error("CSV 다운로드 실패");
+      }
+
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `패널데이터_${new Date().toISOString().split("T")[0]}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
+
+      console.log("✅ CSV 다운로드 완료");
+    } catch (error) {
+      console.error("❌ CSV 다운로드 오류:", error);
+      alert("CSV 다운로드 중 오류가 발생했습니다.");
+    }
+  };
 
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-white via-emerald-50 to-teal-50">
@@ -122,17 +168,45 @@ export default function ResultPage() {
                 </p>
               </div>
 
-              <div className="flex items-center mt-3 mb-1">
-                <Filter className="w-6 h-6 text-emerald-600 mr-2" />
-                <p className="text-emerald-800">신뢰도 필터 기능</p>
+              {/* CSV 다운로드 버튼 */}
+              <button
+                onClick={handleDownloadCSV}
+                disabled={filteredPanels.length === 0}
+                className="w-full mt-3 px-4 py-2 bg-teal-500 hover:bg-teal-600 disabled:bg-gray-300 disabled:cursor-not-allowed text-white rounded-lg flex items-center justify-center gap-2 transition-colors"
+              >
+                <Download className="w-5 h-5" />
+                <span>CSV 다운로드</span>
+              </button>
+
+              <div className="flex items-center justify-between mt-3 mb-1">
+                <div className="flex items-center">
+                  <Filter className="w-6 h-6 text-emerald-600 mr-2" />
+                  <p className="text-emerald-800">신뢰도 필터 기능</p>
+                </div>
+                <div className="relative group">
+                  <div className="w-5 h-5 rounded-full bg-emerald-500 text-white text-xs flex items-center justify-center cursor-help">
+                    ?
+                  </div>
+                  <div className="absolute right-0 top-6 w-64 bg-white border-2 border-emerald-300 rounded-lg shadow-lg p-3 invisible group-hover:visible z-50">
+                    <p className="text-xs text-gray-700 leading-relaxed">
+                      <span className="font-bold text-emerald-700">
+                        신뢰도란?
+                      </span>
+                      <br />
+                      패널 응답의 일관성과 정확성을 평가한 점수입니다.
+                      나이·직업·차량정보 등의 논리적 모순을 검사하여 100점
+                      만점으로 산출됩니다.
+                    </p>
+                  </div>
+                </div>
               </div>
               <Dropdown
                 options={[
-                  { label: "100%", value: "100" },
-                  { label: "75%", value: "75" },
-                  { label: "50%", value: "50" },
-                  { label: "25%", value: "25" },
-                  { label: "ALL", value: "0" },
+                  { label: "100% (정확히 100점)", value: "100" },
+                  { label: "75% 이상", value: "75" },
+                  { label: "50% 이상", value: "50" },
+                  { label: "25% 이상", value: "25" },
+                  { label: "ALL (전체)", value: "0" },
                 ]}
                 value={trustfilter}
                 onChange={setTrustfilter}

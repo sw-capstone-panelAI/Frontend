@@ -13,6 +13,20 @@ import {
   Smile,
 } from "lucide-react";
 
+// NULL 값을 '무응답'으로 표시하는 헬퍼 함수
+const displayValue = (value, defaultText = "무응답") => {
+  if (
+    value === null ||
+    value === undefined ||
+    value === "" ||
+    value === "-" ||
+    value === "무응답"
+  ) {
+    return defaultText;
+  }
+  return value;
+};
+
 // 📋 패널 카드 컴포넌트 (좌측 리스트에 표시)
 export function PanelCard({ panel, onClick, selected }) {
   return (
@@ -30,12 +44,13 @@ export function PanelCard({ panel, onClick, selected }) {
       {/* 👤 나이 · 성별 */}
       <p className="text-sm text-gray-600">
         {panel.age ? `${panel.age}세` : "나이 미상"} ·{" "}
-        {panel.gender || "성별 미상"}
+        {displayValue(panel.gender, "성별 미상")}
       </p>
 
       {/* 💼 직업 · 거주지 */}
       <p className="text-sm text-emerald-700">
-        {panel.occupation || "직업 미상"} · {panel.residence || "거주지 미상"}
+        {displayValue(panel.occupation, "직업 미상")} ·{" "}
+        {displayValue(panel.residence, "거주지 미상")}
       </p>
 
       {/* 📊 신뢰도 표시 */}
@@ -90,11 +105,11 @@ export function PanelDetailView({ selectedPanel }) {
           <div className="flex items-start justify-between mb-4">
             <div>
               <h2 className="text-3xl mb-2 text-emerald-800">
-                {selectedPanel.id}
+                {selectedPanel.mbSn || selectedPanel.id}
               </h2>
               <p className="text-gray-600">
                 {selectedPanel.age ? `${selectedPanel.age}세` : "나이 미상"} ·{" "}
-                {selectedPanel.gender || "성별 미상"}
+                {displayValue(selectedPanel.gender, "성별 미상")}
               </p>
             </div>
             <div className="flex flex-col items-end gap-1">
@@ -123,7 +138,7 @@ export function PanelDetailView({ selectedPanel }) {
               <div>
                 <p className="text-xs text-gray-600">거주지</p>
                 <p className="text-emerald-800 font-medium">
-                  {selectedPanel.residence || "-"}
+                  {displayValue(selectedPanel.residence)}
                 </p>
               </div>
             </div>
@@ -134,7 +149,7 @@ export function PanelDetailView({ selectedPanel }) {
               <div>
                 <p className="text-xs text-gray-600">직업</p>
                 <p className="text-emerald-800 font-medium">
-                  {selectedPanel.occupation || "-"}
+                  {displayValue(selectedPanel.occupation)}
                 </p>
               </div>
             </div>
@@ -145,7 +160,7 @@ export function PanelDetailView({ selectedPanel }) {
               <div>
                 <p className="text-xs text-gray-600">소득</p>
                 <p className="text-emerald-800 font-medium">
-                  {selectedPanel.personalIncome || "-"}
+                  {displayValue(selectedPanel.personalIncome)}
                 </p>
               </div>
             </div>
@@ -159,13 +174,15 @@ export function PanelDetailView({ selectedPanel }) {
                   {(() => {
                     if (
                       selectedPanel.carModel &&
-                      selectedPanel.carModel !== "-"
+                      selectedPanel.carModel !== "-" &&
+                      selectedPanel.carModel !== "무응답"
                     ) {
                       return selectedPanel.carModel;
                     }
                     if (
                       selectedPanel.carBrand &&
-                      selectedPanel.carBrand !== "-"
+                      selectedPanel.carBrand !== "-" &&
+                      selectedPanel.carBrand !== "무응답"
                     ) {
                       return selectedPanel.carBrand;
                     }
@@ -206,20 +223,26 @@ export function PanelDetailView({ selectedPanel }) {
                     </p>
                     <p>
                       <span className="font-bold text-sky-700">지역특성:</span>{" "}
-                      {selectedPanel.residence || "미상"}{" "}
-                      {selectedPanel.district
+                      {displayValue(selectedPanel.residence, "미상")}{" "}
+                      {selectedPanel.district &&
+                      selectedPanel.district !== "무응답"
                         ? `${selectedPanel.district} 거주`
                         : ""}
                     </p>
                     <p>
                       <span className="font-bold text-sky-700">직업경향:</span>{" "}
-                      {selectedPanel.occupation || "미상"} /{" "}
-                      {selectedPanel.role || "직무 미상"}
+                      {displayValue(selectedPanel.occupation, "미상")} /{" "}
+                      {displayValue(selectedPanel.role, "직무 미상")}
                     </p>
                     <p>
                       <span className="font-bold text-sky-700">생활패턴:</span>{" "}
-                      {selectedPanel.maritalStatus || "결혼여부 미상"},{" "}
-                      {selectedPanel.familySize
+                      {displayValue(
+                        selectedPanel.maritalStatus,
+                        "결혼여부 미상"
+                      )}
+                      ,{" "}
+                      {selectedPanel.familySize &&
+                      selectedPanel.familySize !== "무응답"
                         ? `${selectedPanel.familySize}인 가족`
                         : "가족수 미상"}
                     </p>
@@ -361,25 +384,25 @@ export function PanelDetailView({ selectedPanel }) {
                           <div className="flex justify-between">
                             <dt className="text-gray-500">결혼여부</dt>
                             <dd className="font-medium">
-                              {selectedPanel.maritalStatus || "-"}
+                              {displayValue(selectedPanel.maritalStatus)}
                             </dd>
                           </div>
                           <div className="flex justify-between">
                             <dt className="text-gray-500">자녀수</dt>
                             <dd className="font-medium">
-                              {selectedPanel.children ?? "-"}명
+                              {selectedPanel.children ?? 0}명
                             </dd>
                           </div>
                           <div className="flex justify-between">
                             <dt className="text-gray-500">가족수</dt>
                             <dd className="font-medium">
-                              {selectedPanel.familySize || "-"}
+                              {displayValue(selectedPanel.familySize)}
                             </dd>
                           </div>
                           <div className="flex justify-between">
                             <dt className="text-gray-500">최종학력</dt>
                             <dd className="font-medium">
-                              {selectedPanel.education || "-"}
+                              {displayValue(selectedPanel.education)}
                             </dd>
                           </div>
                         </dl>
@@ -394,15 +417,21 @@ export function PanelDetailView({ selectedPanel }) {
                           {selectedPanel.ownedProducts &&
                           typeof selectedPanel.ownedProducts === "object" ? (
                             Array.isArray(selectedPanel.ownedProducts) ? (
-                              selectedPanel.ownedProducts.map(
-                                (product, idx) => (
-                                  <span
-                                    key={idx}
-                                    className="text-xs px-2 py-1 rounded-full bg-cyan-100 border border-cyan-200 text-cyan-800"
-                                  >
-                                    {product}
-                                  </span>
+                              selectedPanel.ownedProducts.length > 0 ? (
+                                selectedPanel.ownedProducts.map(
+                                  (product, idx) => (
+                                    <span
+                                      key={idx}
+                                      className="text-xs px-2 py-1 rounded-full bg-cyan-100 border border-cyan-200 text-cyan-800"
+                                    >
+                                      {product}
+                                    </span>
+                                  )
                                 )
+                              ) : (
+                                <span className="text-xs text-gray-500">
+                                  보유 제품 없음
+                                </span>
                               )
                             ) : (
                               <span className="text-xs text-gray-500">
@@ -419,25 +448,25 @@ export function PanelDetailView({ selectedPanel }) {
                           <div className="flex justify-between">
                             <span className="text-gray-500">휴대폰 브랜드</span>
                             <span className="font-medium">
-                              {selectedPanel.phoneBrand || "-"}
+                              {displayValue(selectedPanel.phoneBrand)}
                             </span>
                           </div>
                           <div className="flex justify-between">
                             <span className="text-gray-500">휴대폰 모델명</span>
                             <span className="font-medium">
-                              {selectedPanel.phoneModel || "-"}
+                              {displayValue(selectedPanel.phoneModel)}
                             </span>
                           </div>
                           <div className="flex justify-between">
                             <span className="text-gray-500">차량 제조사</span>
                             <span className="font-medium">
-                              {selectedPanel.carBrand || "-"}
+                              {displayValue(selectedPanel.carBrand)}
                             </span>
                           </div>
                           <div className="flex justify-between">
                             <span className="text-gray-500">차량 모델</span>
                             <span className="font-medium">
-                              {selectedPanel.carModel || "-"}
+                              {displayValue(selectedPanel.carModel)}
                             </span>
                           </div>
                         </div>
@@ -454,13 +483,21 @@ export function PanelDetailView({ selectedPanel }) {
                             <span className="inline-flex items-center gap-2">
                               <span
                                 className={`h-2 w-2 rounded-full ${
-                                  selectedPanel.smokingExperience
+                                  selectedPanel.smokingExperience &&
+                                  Array.isArray(
+                                    selectedPanel.smokingExperience
+                                  ) &&
+                                  selectedPanel.smokingExperience.length > 0
                                     ? "bg-red-400"
                                     : "bg-gray-300"
                                 }`}
                               />
                               <span className="font-medium text-gray-700">
-                                {selectedPanel.smokingExperience
+                                {selectedPanel.smokingExperience &&
+                                Array.isArray(
+                                  selectedPanel.smokingExperience
+                                ) &&
+                                selectedPanel.smokingExperience.length > 0
                                   ? "경험 있음"
                                   : "무응답"}
                               </span>
@@ -471,42 +508,54 @@ export function PanelDetailView({ selectedPanel }) {
                             <span className="inline-flex items-center gap-2">
                               <span
                                 className={`h-2 w-2 rounded-full ${
-                                  selectedPanel.drinkingExperience
+                                  selectedPanel.drinkingExperience &&
+                                  Array.isArray(
+                                    selectedPanel.drinkingExperience
+                                  ) &&
+                                  selectedPanel.drinkingExperience.length > 0
                                     ? "bg-amber-400"
                                     : "bg-gray-300"
                                 }`}
                               />
                               <span className="font-medium text-gray-700">
-                                {selectedPanel.drinkingExperience
+                                {selectedPanel.drinkingExperience &&
+                                Array.isArray(
+                                  selectedPanel.drinkingExperience
+                                ) &&
+                                selectedPanel.drinkingExperience.length > 0
                                   ? "경험 있음"
                                   : "무응답"}
                               </span>
                             </span>
                           </div>
-                          {selectedPanel.smokingExperience && (
-                            <div className="mt-2 p-2 bg-white rounded border border-sky-200">
-                              <p className="text-xs text-gray-600 mb-1">
-                                흡연 상세:
-                              </p>
-                              <p className="text-xs text-gray-800">
-                                {formatJsonData(
-                                  selectedPanel.smokingExperience
-                                )}
-                              </p>
-                            </div>
-                          )}
-                          {selectedPanel.drinkingExperience && (
-                            <div className="mt-2 p-2 bg-white rounded border border-sky-200">
-                              <p className="text-xs text-gray-600 mb-1">
-                                음주 상세:
-                              </p>
-                              <p className="text-xs text-gray-800">
-                                {formatJsonData(
-                                  selectedPanel.drinkingExperience
-                                )}
-                              </p>
-                            </div>
-                          )}
+                          {selectedPanel.smokingExperience &&
+                            Array.isArray(selectedPanel.smokingExperience) &&
+                            selectedPanel.smokingExperience.length > 0 && (
+                              <div className="mt-2 p-2 bg-white rounded border border-sky-200">
+                                <p className="text-xs text-gray-600 mb-1">
+                                  흡연 상세:
+                                </p>
+                                <p className="text-xs text-gray-800">
+                                  {formatJsonData(
+                                    selectedPanel.smokingExperience
+                                  )}
+                                </p>
+                              </div>
+                            )}
+                          {selectedPanel.drinkingExperience &&
+                            Array.isArray(selectedPanel.drinkingExperience) &&
+                            selectedPanel.drinkingExperience.length > 0 && (
+                              <div className="mt-2 p-2 bg-white rounded border border-sky-200">
+                                <p className="text-xs text-gray-600 mb-1">
+                                  음주 상세:
+                                </p>
+                                <p className="text-xs text-gray-800">
+                                  {formatJsonData(
+                                    selectedPanel.drinkingExperience
+                                  )}
+                                </p>
+                              </div>
+                            )}
                         </div>
                       </div>
                     </div>
@@ -522,7 +571,6 @@ export function PanelDetailView({ selectedPanel }) {
 }
 
 // 📊 전체 패널 요약 정보 컴포넌트
-// 📊 전체 패널 요약 정보 컴포넌트
 export function TotalInfo({ panels = [] }) {
   const panelsCnt = panels.length;
 
@@ -534,34 +582,49 @@ export function TotalInfo({ panels = [] }) {
         )
       : 0;
 
-  // 최빈 소득 구간 계산
+  // 최빈 소득 구간 계산 (무응답 제외 후 다음으로 많은 항목 표시)
   const panelsInco = (() => {
-    if (panelsCnt === 0) return "-";
+    if (panelsCnt === 0) return "미상";
+
+    // 유효 소득만 필터링
+    const filteredIncomes = panels.filter(
+      (p) =>
+        p.personalIncome &&
+        p.personalIncome !== "-" &&
+        p.personalIncome !== "null" &&
+        p.personalIncome !== null &&
+        p.personalIncome !== "무응답"
+    );
+
+    if (filteredIncomes.length === 0) return "미상";
 
     // 소득 구간별 카운트
-    const incomeCount = panels.reduce((acc, p) => {
+    const incomeCount = filteredIncomes.reduce((acc, p) => {
       const income = p.personalIncome;
-      if (income && income !== "-" && income !== "null" && income !== null) {
-        acc[income] = (acc[income] || 0) + 1;
-      }
+      acc[income] = (acc[income] || 0) + 1;
       return acc;
     }, {});
 
+    if (Object.keys(incomeCount).length === 0) return "미상";
+
+    // 최빈 소득 구간 찾기
     const entries = Object.entries(incomeCount);
-    if (entries.length === 0) return "-";
-
-    // 가장 많이 나온 소득 구간 찾기
-    const maxEntry = entries.reduce((max, current) => {
-      return current[1] > max[1] ? current : max;
-    }, entries[0]);
-
+    const maxEntry = entries.reduce(
+      (max, current) => (current[1] > max[1] ? current : max),
+      entries[0]
+    );
     return maxEntry[0];
   })();
 
   // 거주지 카운트
   const residenceCount = panels.reduce((acc, p) => {
     const residence = p.residence;
-    if (residence && residence !== "-" && residence !== "미상") {
+    if (
+      residence &&
+      residence !== "-" &&
+      residence !== "미상" &&
+      residence !== "무응답"
+    ) {
       acc[residence] = (acc[residence] || 0) + 1;
     }
     return acc;
@@ -570,7 +633,7 @@ export function TotalInfo({ panels = [] }) {
   // 최빈 거주지 계산
   const panelsHome = (() => {
     const entries = Object.entries(residenceCount);
-    if (entries.length === 0) return "-";
+    if (entries.length === 0) return "무응답";
 
     const maxEntry = entries.reduce((max, current) => {
       return current[1] > max[1] ? current : max;
