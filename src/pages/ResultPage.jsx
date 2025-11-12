@@ -216,7 +216,7 @@ export default function ResultPage() {
 
             {filteredPanels.map((panel) => (
               <PanelCard
-                key={panel.id}
+                key={panel["패널id"]}
                 panel={panel}
                 selected={selectedPanel?.id === panel.id}
                 onClick={() => setSelectedPanel(panel)}

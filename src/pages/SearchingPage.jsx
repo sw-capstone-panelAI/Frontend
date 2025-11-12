@@ -47,7 +47,7 @@ export default function SearchingPage() {
       try {
         console.log("검색 요청:", query);
 
-        const res = await axios.post("http://localhost:5000/api/search", {
+        const res = await axios.post("http://localhost:5000/search/panel", {
           query,
         });
 
