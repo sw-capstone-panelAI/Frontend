@@ -11,30 +11,52 @@ import {
 import incomePng from "@assets/income.png";
 
 function IncomeDistributionChart({ panels }) {
-  // ✅ 1. 구간 정의
+  // ✅ 1. 구간 정의 (100만원 단위)
   const incomeRanges = [
-    { label: "0~1999", min: 0, max: 1999 },
-    { label: "2000~2999", min: 2000, max: 2999 },
-    { label: "3000~3999", min: 3000, max: 3999 },
-    { label: "4000~4999", min: 4000, max: 4999 },
-    { label: "5000~5999", min: 5000, max: 5999 },
-    { label: "6000~6999", min: 6000, max: 6999 },
-    { label: "7000+", min: 7000, max: Infinity },
+    { label: "100만원 미만", min: 0, max: 99 },
+    { label: "100~199만원", min: 100, max: 199 },
+    { label: "200~299만원", min: 200, max: 299 },
+    { label: "300~399만원", min: 300, max: 399 },
+    { label: "400~499만원", min: 400, max: 499 },
+    { label: "500~599만원", min: 500, max: 599 },
+    { label: "600~699만원", min: 600, max: 699 },
+    { label: "700~799만원", min: 700, max: 799 },
+    { label: "800~899만원", min: 800, max: 899 },
+    { label: "900~999만원", min: 900, max: 999 },
+    { label: "1000만원 이상", min: 1000, max: Infinity },
   ];
 
-  // ✅ 2. 각 구간별 인원 수 집계 (널 값 처리 추가)
+  // ✅ 2. 소득 문자열을 숫자로 변환하는 함수
+  const parseIncome = (incomeStr) => {
+    if (!incomeStr || incomeStr === "무응답" || incomeStr === "-") return null;
+
+    // "월 100만원 미만" → 50 (중간값)
+    if (incomeStr.includes("미만")) return 50;
+
+    // "월 100~199만원" → 150 (중간값)
+    const match = incomeStr.match(/(\d+)~(\d+)/);
+    if (match) {
+      const min = parseInt(match[1]);
+      const max = parseInt(match[2]);
+      return (min + max) / 2;
+    }
+
+    // "월 1000만원 이상" → 1000
+    if (incomeStr.includes("이상")) return 1000;
+
+    return null;
+  };
+
+  // ✅ 3. 각 구간별 인원 수 집계
   const distribution = incomeRanges.map((range) => {
-    const count = panels.filter(
-      (p) =>
-        p.income !== null &&
-        p.income !== undefined &&
-        p.income >= range.min &&
-        p.income <= range.max
-    ).length;
+    const count = panels.filter((p) => {
+      const income = parseIncome(p.personalIncome);
+      return income !== null && income >= range.min && income <= range.max;
+    }).length;
     return { name: range.label, value: count };
   });
 
-  // ✅ 3. 차트 렌더링
+  // ✅ 4. 차트 렌더링
   return (
     // 🎨 차트 컨테이너: 흰색 배경 + 초록색 테두리
     <div className="flex flex-col bg-white border border-emerald-200 rounded-lg p-6 shadow-sm">
@@ -57,13 +79,16 @@ function IncomeDistributionChart({ panels }) {
         <ResponsiveContainer width="100%" height={350}>
           <BarChart
             data={distribution}
-            margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
+            margin={{ top: 20, right: 30, left: 20, bottom: 60 }}
           >
             <CartesianGrid strokeDasharray="3 3" stroke="#d1fae5" />
             <XAxis
               dataKey="name"
-              tick={{ fill: "#047857" }}
+              tick={{ fill: "#047857", fontSize: 11 }}
               axisLine={{ stroke: "#a7f3d0" }}
+              angle={-45}
+              textAnchor="end"
+              height={80}
             />
             <YAxis
               allowDecimals={false}
@@ -78,7 +103,7 @@ function IncomeDistributionChart({ panels }) {
             />
             <Tooltip
               formatter={(value) => [`${value}명`, "인원수"]}
-              labelFormatter={(label) => `소득 구간: ${label}만원`}
+              labelFormatter={(label) => `소득 구간: ${label}`}
               contentStyle={{
                 backgroundColor: "white",
                 border: "1px solid #a7f3d0",
