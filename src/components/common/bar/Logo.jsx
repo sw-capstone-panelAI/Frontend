@@ -12,20 +12,18 @@ export function Logo() {
       >
         {/* 🎨 아이콘 컨테이너 */}
         <div className="relative">
-          {/* ✨ Sparkles 아이콘 - 반짝이는 별 모양: 초록색 */}
-          <Sparkles className={"w-10 h-10 text-emerald-500"} />
+          {/* ✨ Sparkles 아이콘 - 반짝이는 별 모양: 인디고 색상 */}
+          <Sparkles className={"w-10 h-10 text-indigo-500"} />
         </div>
 
-        {/* 🎨 로고 텍스트: 초록색 그라데이션 */}
-        {/* 
-        bg-gradient-to-r: 왼쪽에서 오른쪽으로 그라데이션
-        from-emerald-500 to-teal-500: 초록색에서 청록색으로
-        bg-clip-text: 그라데이션을 텍스트에만 적용
-        text-transparent: 텍스트를 투명하게 해서 그라데이션이 보이도록
-      */}
+        {/* 🎨 로고 텍스트: 인디고 계열 부드러운 그라데이션 */}
+        {/* bg-gradient-to-r: 왼쪽에서 오른쪽으로 그라데이션
+            from-indigo-500 to-slate-500: 인디고에서 슬레이트로 자연스러운 컬러 전환
+            bg-clip-text: 그라데이션을 텍스트에만 적용
+            text-transparent: 텍스트를 투명하게 해서 그라데이션 보이도록 */}
         <span
           className={
-            "text-3xl font-bold bg-gradient-to-r from-emerald-500 to-teal-500 bg-clip-text text-transparent hover:bg-gradient-to-l transition-all"
+            "text-3xl font-bold bg-gradient-to-r from-indigo-500 to-slate-500 bg-clip-text text-transparent hover:bg-gradient-to-l transition-all"
           }
         >
           PanelFinder
