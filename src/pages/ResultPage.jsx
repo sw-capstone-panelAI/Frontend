@@ -67,8 +67,7 @@ export default function ResultPage() {
       .sort((a, b) => b.reliability - a.reliability)
       .map((p, idx) => ({
         ...p,
-        displayId: `패널${idx + 1}`, // 왼쪽 리스트용 임의 번호명
-        // id는 실제 패널 ID를 그대로 유지 (상세정보용)
+        displayId: `패널${idx + 1}`,
       }));
 
     setFilteredPanels(newPanels);
@@ -183,7 +182,7 @@ export default function ResultPage() {
               <PanelCard
                 key={panel.id}
                 panel={panel}
-                displayId={panel.displayId} // 임의 번호명 전달
+                displayId={panel.displayId}
                 selected={selectedPanel?.id === panel.id}
                 onClick={() => setSelectedPanel(panel)}
               />
@@ -215,7 +214,11 @@ export default function ResultPage() {
                 exeText="AI 분석 결과 보기"
                 color="indigo"
                 icon={<SquaresIntersect className="text-indigo-600" />}
-                onClick={() => alert("공통 특성")}
+                onClick={() => {
+                  navigate(routes.common, {
+                    state: { panels: filteredPanels },
+                  });
+                }}
               />
             </div>
 
