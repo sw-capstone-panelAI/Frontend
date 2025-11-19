@@ -14,14 +14,14 @@ import {
 import residencePng from "@assets/residence.png"; // 지역 아이콘 이미지 (필요시 수정)
 import { ChevronLeft } from "lucide-react";
 
-// 🎨 지역권별 색상: 초록색~청록색 계열의 부드러운 톤
+// 🎨 지역권별 색상: 슬레이트~인디고 계열의 부드러운 톤
 const REGION_GROUP_COLORS = {
-  수도권: "#6ee7b7", // emerald-300
-  영남권: "#5eead4", // teal-300
-  호남권: "#86efac", // green-300
-  충청권: "#a7f3d0", // emerald-200
-  강원권: "#059669", // emerald-600
-  제주권: "#047857", // emerald-700
+  수도권: "#a5b4fc", // indigo-300
+  영남권: "#818cf8", // indigo-400
+  호남권: "#6366f1", // indigo-500
+  충청권: "#4f46e5", // indigo-600
+  강원권: "#4338ca", // indigo-700
+  제주권: "#3730a3", // indigo-800
   "기타/해외": "#cbd5e1", // slate-300
 };
 
@@ -36,39 +36,39 @@ const REGION_GROUPS = {
   "기타/해외": ["기타/해외"],
 };
 
-// 🎨 상세 지역별 색상 (같은 권역 내에서 톤 차이)
+// 🎨 상세 지역별 색상 (같은 권역 내 톤 차이)
 const DETAIL_COLORS = {
   // 수도권
-  서울: "#6ee7b7",
-  경기: "#34d399",
-  인천: "#10b981",
+  서울: "#c7d2fe", // indigo-200
+  경기: "#a5b4fc", // indigo-300
+  인천: "#818cf8", // indigo-400
 
   // 영남권
-  부산: "#5eead4",
-  울산: "#2dd4bf",
-  대구: "#14b8a6",
-  경남: "#0d9488",
-  경북: "#0f766e",
+  부산: "#6366f1", // indigo-500
+  울산: "#4f46e5", // indigo-600
+  대구: "#4338ca", // indigo-700
+  경남: "#3730a3", // indigo-800
+  경북: "#312e81", // indigo-900
 
   // 호남권
-  광주: "#86efac",
-  전남: "#4ade80",
-  전북: "#22c55e",
+  광주: "#c7d2fe", // indigo-200
+  전남: "#a5b4fc", // indigo-300
+  전북: "#818cf8", // indigo-400
 
   // 충청권
-  대전: "#a7f3d0",
-  세종: "#d1fae5",
-  충남: "#6ee7b7",
-  충북: "#34d399",
+  대전: "#6366f1", // indigo-500
+  세종: "#4f46e5", // indigo-600
+  충남: "#4338ca", // indigo-700
+  충북: "#3730a3", // indigo-800
 
   // 강원권
-  강원: "#059669",
+  강원: "#312e81", // indigo-900
 
   // 제주권
-  제주: "#047857",
+  제주: "#3730a3", // indigo-800
 
   // 기타
-  "기타/해외": "#cbd5e1",
+  "기타/해외": "#cbd5e1", // slate-300
 };
 
 // 전체 지역 목록
@@ -108,8 +108,6 @@ function ResidenceDistributionChart({ panels = [] }) {
       const region = p.residence?.trim() || "기타/해외";
       if (Object.prototype.hasOwnProperty.call(counts, region)) {
         counts[region] += 1;
-      } else {
-        //counts["기타/해외"] += 1; // 기타 해외
       }
     });
 
@@ -155,7 +153,7 @@ function ResidenceDistributionChart({ panels = [] }) {
   };
 
   return (
-    <div className="flex flex-col bg-white border border-emerald-200 rounded-lg p-6 shadow-sm">
+    <div className="flex flex-col bg-white border border-slate-300 rounded-lg p-6 shadow-sm">
       {/* 📊 차트 제목 및 아이콘 */}
       <div className="flex items-center justify-between mb-4">
         <h3 className="flex items-center space-x-3">
@@ -166,7 +164,7 @@ function ResidenceDistributionChart({ panels = [] }) {
             alt="거주지 분포"
             className="object-contain"
           />
-          <span className="text-emerald-700 font-medium">
+          <span className="text-indigo-700 font-medium">
             {selectedGroup ? `[${selectedGroup} 상세 분포]` : "[거주지 분포]"}
           </span>
         </h3>
@@ -175,7 +173,7 @@ function ResidenceDistributionChart({ panels = [] }) {
         {selectedGroup && (
           <button
             onClick={handleBack}
-            className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-emerald-400 to-teal-400 text-white rounded-lg hover:from-emerald-500 hover:to-teal-500 transition-all shadow-sm"
+            className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-indigo-400 to-indigo-500 text-white rounded-lg hover:from-indigo-500 hover:to-indigo-600 transition-all shadow-sm"
           >
             <ChevronLeft className="w-4 h-4" />
             <span>전체 보기</span>
@@ -214,7 +212,7 @@ function ResidenceDistributionChart({ panels = [] }) {
                 formatter={(value) => [`${value}명`, "인원"]}
                 contentStyle={{
                   backgroundColor: "white",
-                  border: "1px solid #a7f3d0",
+                  border: "1px solid #cbd5e1", // slate-300
                   borderRadius: "8px",
                 }}
               />
@@ -229,27 +227,28 @@ function ResidenceDistributionChart({ panels = [] }) {
               data={detailData}
               margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
             >
-              <CartesianGrid strokeDasharray="3 3" stroke="#d1fae5" />
+              <CartesianGrid strokeDasharray="3 3" stroke="#e0e7ff" />{" "}
+              {/* indigo-100 */}
               <XAxis
                 dataKey="name"
-                tick={{ fill: "#047857" }}
-                axisLine={{ stroke: "#a7f3d0" }}
+                tick={{ fill: "#4338ca" }} /* indigo-700 */
+                axisLine={{ stroke: "#a5b4fc" }} /* indigo-300 */
               />
               <YAxis
-                tick={{ fill: "#047857" }}
-                axisLine={{ stroke: "#a7f3d0" }}
+                tick={{ fill: "#4338ca" }}
+                axisLine={{ stroke: "#a5b4fc" }}
                 label={{
                   value: "인원 (명)",
                   angle: -90,
                   position: "insideLeft",
-                  fill: "#047857",
+                  fill: "#4338ca",
                 }}
               />
               <Tooltip
                 formatter={(value) => [`${value}명`, "인원"]}
                 contentStyle={{
                   backgroundColor: "white",
-                  border: "1px solid #a7f3d0",
+                  border: "1px solid #cbd5e1",
                   borderRadius: "8px",
                 }}
               />
@@ -275,7 +274,7 @@ function ResidenceDistributionChart({ panels = [] }) {
 
       {/* 💡 안내 메시지 */}
       {!selectedGroup && (
-        <p className="text-center text-emerald-900 text-sm mt-4">
+        <p className="text-center text-indigo-900 text-sm mt-4">
           💡 지역권을 클릭하면 상세 지역별 인원수를 확인할 수 있습니다
         </p>
       )}

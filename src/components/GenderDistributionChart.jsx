@@ -9,8 +9,8 @@ function GenderDistributionChart({ panels }) {
   const femaleCount = panels.filter((p) => p.gender === "여성").length;
 
   return (
-    // 🎨 차트 컨테이너: 흰색 배경 + 초록색 테두리
-    <div className="flex flex-col bg-white border border-emerald-200 rounded-lg p-6 shadow-sm">
+    // 🎨 차트 컨테이너: 흰색 배경 + 슬레이트 색 테두리
+    <div className="flex flex-col bg-white border border-slate-300 rounded-lg p-6 shadow-sm">
       {/* 📊 차트 제목 및 아이콘 */}
       <div className="flex items-center justify-between mb-4">
         <h3 className="flex items-center space-x-3">
@@ -21,7 +21,7 @@ function GenderDistributionChart({ panels }) {
             alt="성별 분포"
             className="object-contain"
           />
-          <span className="text-emerald-700 font-medium">[성별 분포]</span>
+          <span className="text-indigo-700 font-medium">[성별 분포]</span>
         </h3>
       </div>
 
@@ -43,15 +43,15 @@ function GenderDistributionChart({ panels }) {
               outerRadius={120}
               dataKey="value"
             >
-              {/* 🎨 남성: 초록색, 여성: 연한 청록색 */}
-              <Cell fill="#34d399" />
-              <Cell fill="#6ee7b7" />
+              {/* 🎨 남성: 인디고 톤, 여성: 슬레이트 톤 */}
+              <Cell fill="#4f46e5" /> {/* indigo-600 */}
+              <Cell fill="#64748b" /> {/* slate-500 */}
             </Pie>
             <Tooltip
               formatter={(value) => [`${value}명`, "인원"]}
               contentStyle={{
                 backgroundColor: "white",
-                border: "1px solid #a7f3d0",
+                border: "1px solid #cbd5e1", // slate-300
                 borderRadius: "8px",
               }}
             />
@@ -61,4 +61,5 @@ function GenderDistributionChart({ panels }) {
     </div>
   );
 }
+
 export default GenderDistributionChart;

@@ -5,6 +5,7 @@ import SearchingPage from "./pages/SearchingPage";
 import TestPage from "./pages/TestPage";
 import ResultPage from "./pages/ResultPage";
 import RelatedSearchPage from "@/pages/RelatedSearchPage";
+import CommonPage from "@/pages/CommonPage";
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
           <Route path={routes.test} element={<TestPage />} />
           <Route path={routes.result} element={<ResultPage />} />
           <Route path={routes.resultex} element={<RelatedSearchPage />} />
+          <Route path={routes.common} element={<CommonPage />} />
         </Routes>
       </Router>
     </>

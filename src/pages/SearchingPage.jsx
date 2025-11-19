@@ -7,9 +7,9 @@ import axios from "axios";
 
 function ProgressBar({ value }) {
   return (
-    <div className="relative h-2 w-full overflow-hidden rounded-full bg-emerald-200">
+    <div className="relative h-2 w-full overflow-hidden rounded-full bg-slate-300">
       <div
-        className="h-full transition-all bg-emerald-500"
+        className="h-full transition-all bg-indigo-600"
         style={{ width: `${value}%` }}
       />
     </div>
@@ -109,7 +109,7 @@ export default function SearchingPage() {
   const CurrentIcon = steps[currentStep]?.icon || Loader2;
 
   return (
-    <div className="min-h-screen w-screen bg-gradient-to-br from-white via-emerald-50 to-teal-50 flex flex-col">
+    <div className="min-h-screen w-screen bg-gradient-to-br from-gray-50 via-gray-100 to-gray-200 flex flex-col">
       <header className="w-full flex items-center gap-3 px-5 py-5">
         <HeaderBar />
       </header>
@@ -118,10 +118,10 @@ export default function SearchingPage() {
         <div className="w-full max-w-2xl min-h-[600px] flex flex-col justify-center space-y-10 mx-auto">
           <div className="flex flex-col items-center space-y-8">
             <div className="relative">
-              <div className="w-24 h-24 rounded-full bg-emerald-100 flex items-center justify-center">
-                <CurrentIcon className="w-12 h-12 text-emerald-600 animate-pulse" />
+              <div className="w-24 h-24 rounded-full bg-indigo-100 flex items-center justify-center">
+                <CurrentIcon className="w-12 h-12 text-indigo-600 animate-pulse" />
               </div>
-              <Loader2 className="w-24 h-24 text-emerald-300 animate-spin absolute inset-0" />
+              <Loader2 className="w-24 h-24 text-indigo-300 animate-spin absolute inset-0" />
             </div>
 
             <div className="text-center space-y-2">
@@ -158,13 +158,13 @@ export default function SearchingPage() {
                   <div
                     className={`w-10 h-10 rounded-full flex items-center justify-center border-2 transition-all duration-300 ${
                       isActive
-                        ? "border-emerald-500 bg-emerald-100"
-                        : "border-emerald-200"
+                        ? "border-indigo-500 bg-indigo-100"
+                        : "border-slate-300"
                     }`}
                   >
                     <StepIcon
                       className={`w-5 h-5 ${
-                        isActive ? "text-emerald-600" : "text-gray-400"
+                        isActive ? "text-indigo-600" : "text-gray-400"
                       }`}
                     />
                   </div>

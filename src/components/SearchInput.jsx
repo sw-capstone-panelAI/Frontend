@@ -18,24 +18,24 @@ export function SearchInput({
   return (
     <div className="relative w-full max-w-3xl">
       <div className="relative">
-        {/* 🔍 검색 입력 필드: 흰색 배경 + 초록색 포커스 */}
+        {/* 🔍 검색 입력 필드: 흰색 배경 + 슬레이트/인디고 포커스 */}
         <CustomInput
           value={value}
           onChange={(e) => onChange(e.target.value)}
           onKeyPress={handleKeyPress}
           placeholder={placeholder}
           disabled={disabled}
-          className="w-full h-14 pl-6 pr-14 bg-white border-2 border-emerald-200 rounded-xl 
-                     focus:border-emerald-400 transition-all duration-200
+          className="w-full h-14 pl-6 pr-14 bg-white border-2 border-slate-300 rounded-xl
+                     focus:border-indigo-400 transition-all duration-200
                      placeholder:text-gray-400"
         />
-        {/* 🔍 검색 버튼: 초록색 배경 */}
+        {/* 🔍 검색 버튼: 인디고 배경 */}
         <button
           onClick={onSearch}
           disabled={disabled || !value.trim()}
-          className="absolute right-3 top-1/2 -translate-y-1/2 p-2.5 
-                     bg-emerald-500 text-white rounded-lg
-                     hover:bg-emerald-600 transition-colors
+          className="absolute right-3 top-1/2 -translate-y-1/2 p-2.5
+                     bg-indigo-600 text-white rounded-lg
+                     hover:bg-indigo-700 transition-colors
                      disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <Search className="w-5 h-5" />
