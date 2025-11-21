@@ -1,21 +1,19 @@
 import { useState, useEffect } from "react";
-import { Loader2, Sparkles, ArrowLeft, X } from "lucide-react";
+import { Loader2, Sparkles, ArrowLeft, X, AlertCircle } from "lucide-react";
 import HeaderBar from "@common/bar/HeaderBar";
 import { useLocation, useNavigate } from "react-router-dom";
 import routes from "@utils/constants/routes";
 
 /**
- * 마인드맵 노드 위치 및 중앙 위치
+ * 마인드맵 노드 위치 및 중앙 위치 (6개로 조정)
  */
 const positions = [
   { x: 30, y: 20 },
   { x: 70, y: 20 },
-  { x: 15, y: 45 },
-  { x: 50, y: 30 },
-  { x: 85, y: 45 },
-  { x: 30, y: 70 },
-  { x: 70, y: 70 },
-  { x: 50, y: 85 },
+  { x: 15, y: 50 },
+  { x: 85, y: 50 },
+  { x: 30, y: 80 },
+  { x: 70, y: 80 },
 ];
 const CENTER_POS = { x: 50, y: 50 };
 
@@ -24,7 +22,6 @@ const CENTER_POS = { x: 50, y: 50 };
  */
 function MindMapNode({
   label,
-  percentage,
   onClick,
   position,
   isCenter = false,
@@ -52,9 +49,35 @@ function MindMapNode({
     >
       <div className="flex items-center gap-2 whitespace-nowrap">
         <span className="text-sm font-medium">{label}</span>
-        {!isCenter && percentage !== undefined && (
-          <span className="text-xs opacity-70">{percentage}%</span>
-        )}
+      </div>
+    </div>
+  );
+}
+
+/**
+ * 말풍선 알림 컴포넌트 (마인드맵 중앙)
+ */
+function ToastNotification({ show, message }) {
+  if (!show) return null;
+
+  return (
+    <div
+      className="absolute z-40 transform -translate-x-1/2 -translate-y-1/2 animate-in fade-in zoom-in-95 duration-300"
+      style={{
+        left: "50%",
+        top: "50%",
+      }}
+    >
+      <div className="relative bg-gradient-to-r from-amber-500 to-orange-500 text-white px-6 py-4 rounded-2xl shadow-2xl border-2 border-amber-600 max-w-xs">
+        <div className="flex items-center gap-3">
+          <AlertCircle className="w-6 h-6 flex-shrink-0" />
+          <p className="text-sm font-bold whitespace-pre-line">{message}</p>
+        </div>
+        {/* 말풍선 꼬리 */}
+        <div className="absolute left-1/2 bottom-0 transform -translate-x-1/2 translate-y-full">
+          <div className="w-0 h-0 border-l-[10px] border-l-transparent border-r-[10px] border-r-transparent border-t-[10px] border-t-amber-600"></div>
+          <div className="w-0 h-0 border-l-[8px] border-l-transparent border-r-[8px] border-r-transparent border-t-[8px] border-t-amber-500 absolute left-1/2 transform -translate-x-1/2 -top-[9px]"></div>
+        </div>
       </div>
     </div>
   );
@@ -107,6 +130,8 @@ export default function App() {
   const [selectedQueries, setSelectedQueries] = useState([]);
   const [recommendedQuery, setRecommendedQuery] = useState("");
   const [message, setMessage] = useState(null);
+  const [showToast, setShowToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState("");
 
   const location = useLocation();
   const navigate = useNavigate();
@@ -114,24 +139,100 @@ export default function App() {
   const { query: originalQuery } = location.state || {};
 
   useEffect(() => {
+    // 랜덤 키워드 생성 함수 (6개만 생성)
+    const generateRandomKeywords = () => {
+      const genders = ["남성", "여성"];
+      const ages = ["10대", "20대", "30대", "40대", "50대", "60대"];
+      const regions = [
+        "서울",
+        "부산",
+        "경기",
+        "인천",
+        "대구",
+        "광주",
+        "대전",
+        "울산",
+        "세종",
+        "강원",
+        "충북",
+        "충남",
+        "전북",
+        "전남",
+        "경북",
+        "경남",
+        "제주",
+      ];
+      const incomes = [
+        "월 100만원 미만",
+        "월 100~199만원",
+        "월 200~299만원",
+        "월 300~399만원",
+        "월 400~499만원",
+        "월 500~599만원",
+        "월 600~699만원",
+        "월 700만원이상",
+      ];
+      const maritalStatuses = ["기혼", "미혼"];
+      const carOwnerships = ["차량 보유", "차량 미보유"];
+
+      const randomGender = genders[Math.floor(Math.random() * genders.length)];
+      const randomAge = ages[Math.floor(Math.random() * ages.length)];
+      const randomRegion = regions[Math.floor(Math.random() * regions.length)];
+      const randomIncome = incomes[Math.floor(Math.random() * incomes.length)];
+      const randomMarital =
+        maritalStatuses[Math.floor(Math.random() * maritalStatuses.length)];
+      const randomCar =
+        carOwnerships[Math.floor(Math.random() * carOwnerships.length)];
+
+      // 6개만 반환
+      return [
+        { text: randomGender },
+        { text: randomAge },
+        { text: randomRegion },
+        { text: randomIncome },
+        { text: randomMarital },
+        { text: randomCar },
+      ];
+    };
+
     setTimeout(() => {
-      setRelatedQueries([
-        { text: "20대 여성", similarity: 0.92 },
-        { text: "서울 거주", similarity: 0.88 },
-        { text: "직장인", similarity: 0.85 },
-        { text: "월소득 300만원", similarity: 0.82 },
-        { text: "미혼", similarity: 0.78 },
-        { text: "대졸", similarity: 0.75 },
-        { text: "IT업계", similarity: 0.72 },
-      ]);
+      setRelatedQueries(generateRandomKeywords());
       setLoading(false);
     }, 1500);
   }, []);
 
+  // Toast 자동 숨김 효과
+  useEffect(() => {
+    if (showToast) {
+      const timer = setTimeout(() => {
+        setShowToast(false);
+      }, 2500); // 2.5초 후 사라짐
+
+      return () => clearTimeout(timer);
+    }
+  }, [showToast]);
+
+  const showToastNotification = (msg) => {
+    setToastMessage(msg);
+    setShowToast(true);
+  };
+
   const toggleQuery = (q) => {
-    setSelectedQueries((prev) =>
-      prev.includes(q) ? prev.filter((x) => x !== q) : [...prev, q]
-    );
+    setSelectedQueries((prev) => {
+      // 이미 선택된 경우 제거
+      if (prev.includes(q)) {
+        return prev.filter((x) => x !== q);
+      }
+
+      // 최대 4개까지만 선택 가능
+      if (prev.length >= 4) {
+        showToastNotification("최대 4개까지만\n선택할 수 있습니다!");
+        return prev;
+      }
+
+      // 새로 추가
+      return [...prev, q];
+    });
   };
 
   const generateQuery = () => {
@@ -153,16 +254,8 @@ export default function App() {
 
   const handleSearch = () => {
     if (recommendedQuery) {
-      setMessage({
-        title: "검색 실행 요청",
-        body: `'${recommendedQuery}' 검색이 실행되었습니다.\n검색 페이지로 이동합니다.`,
-        onConfirm: () => {
-          setMessage(null);
-          setRecommendedQuery("");
-          setSelectedQueries([]);
-          navigate(routes.search, { state: { query: `${recommendedQuery}` } });
-        },
-      });
+      // 모달 없이 바로 라우팅
+      navigate(routes.search, { state: { query: recommendedQuery } });
     }
   };
 
@@ -204,6 +297,9 @@ export default function App() {
           className="flex-1 relative bg-white rounded-xl shadow-md p-8 mb-6 border-2 border-indigo-200"
           style={{ minHeight: 500 }}
         >
+          {/* Toast 알림 */}
+          <ToastNotification show={showToast} message={toastMessage} />
+
           {loading && relatedQueries.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full absolute inset-0 bg-white/80 backdrop-blur-sm">
               <Loader2 className="w-12 h-12 animate-spin text-indigo-600" />
@@ -253,7 +349,6 @@ export default function App() {
                 <MindMapNode
                   key={item.text}
                   label={item.text}
-                  percentage={Math.round((item.similarity || 0) * 100)}
                   position={positions[idx] || CENTER_POS}
                   onClick={() => toggleQuery(item.text)}
                   isSelected={selectedQueries.includes(item.text)}
@@ -267,7 +362,7 @@ export default function App() {
         {selectedQueries.length > 0 && (
           <section className="mb-6">
             <p className="text-sm text-indigo-700 mb-2 font-semibold">
-              선택한 키워드:
+              선택한 키워드 ({selectedQueries.length}/4):
             </p>
             <div className="flex flex-wrap gap-2">
               {selectedQueries.map((q) => (
@@ -312,7 +407,7 @@ export default function App() {
               <div className="flex gap-3">
                 <button
                   onClick={handleSearch}
-                  className="flex-1 bg-indigo-600 text-white py-2 px-4 rounded-lg font-bold border-2 border-indigo-700 hover:bg-indigo-700 transition-colors shadow-sm"
+                  className="flex-1 bg-indigo-100 text-indigo-800 py-2 px-4 rounded-lg font-bold border-2 border-indigo-600 hover:bg-indigo-200 transition-colors shadow-sm"
                 >
                   이 검색어로 검색하기
                 </button>
@@ -334,7 +429,7 @@ export default function App() {
               <button
                 onClick={generateQuery}
                 disabled={loading}
-                className="w-full bg-indigo-600 text-white py-2 px-4 rounded-lg font-bold flex items-center justify-center gap-2 border-2 border-indigo-700 hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-sm"
+                className="w-full bg-indigo-100 text-indigo-800 py-2 px-4 rounded-lg font-bold flex items-center justify-center gap-2 border-2 border-indigo-600 hover:bg-indigo-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-sm"
               >
                 <Sparkles className="w-4 h-4" />
                 {selectedQueries.length > 0

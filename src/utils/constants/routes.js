@@ -13,6 +13,7 @@ const routes = {
   result: "/result",
   resultex: "/resultex",
   common: "/common",
+  noResult: "/no-result",
 };
 
 export default routes;

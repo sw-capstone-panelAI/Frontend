@@ -11,21 +11,18 @@ import {
   YAxis,
   CartesianGrid,
 } from "recharts";
-import residencePng from "@assets/residence.png"; // 지역 아이콘 이미지 (필요시 수정)
 import { ChevronLeft } from "lucide-react";
 
-// 🎨 지역권별 색상: 슬레이트~인디고 계열의 부드러운 톤
 const REGION_GROUP_COLORS = {
-  수도권: "#a5b4fc", // indigo-300
-  영남권: "#818cf8", // indigo-400
-  호남권: "#6366f1", // indigo-500
-  충청권: "#4f46e5", // indigo-600
-  강원권: "#4338ca", // indigo-700
-  제주권: "#3730a3", // indigo-800
-  "기타/해외": "#cbd5e1", // slate-300
+  수도권: "#a5b4fc",
+  영남권: "#818cf8",
+  호남권: "#6366f1",
+  충청권: "#4f46e5",
+  강원권: "#4338ca",
+  제주권: "#3730a3",
+  "기타/해외": "#cbd5e1",
 };
 
-// 🗺️ 지역권 그룹 정의
 const REGION_GROUPS = {
   수도권: ["서울", "경기", "인천"],
   영남권: ["부산", "울산", "대구", "경남", "경북"],
@@ -36,42 +33,27 @@ const REGION_GROUPS = {
   "기타/해외": ["기타/해외"],
 };
 
-// 🎨 상세 지역별 색상 (같은 권역 내 톤 차이)
 const DETAIL_COLORS = {
-  // 수도권
-  서울: "#c7d2fe", // indigo-200
-  경기: "#a5b4fc", // indigo-300
-  인천: "#818cf8", // indigo-400
-
-  // 영남권
-  부산: "#6366f1", // indigo-500
-  울산: "#4f46e5", // indigo-600
-  대구: "#4338ca", // indigo-700
-  경남: "#3730a3", // indigo-800
-  경북: "#312e81", // indigo-900
-
-  // 호남권
-  광주: "#c7d2fe", // indigo-200
-  전남: "#a5b4fc", // indigo-300
-  전북: "#818cf8", // indigo-400
-
-  // 충청권
-  대전: "#6366f1", // indigo-500
-  세종: "#4f46e5", // indigo-600
-  충남: "#4338ca", // indigo-700
-  충북: "#3730a3", // indigo-800
-
-  // 강원권
-  강원: "#312e81", // indigo-900
-
-  // 제주권
-  제주: "#3730a3", // indigo-800
-
-  // 기타
-  "기타/해외": "#cbd5e1", // slate-300
+  서울: "#c7d2fe",
+  경기: "#a5b4fc",
+  인천: "#818cf8",
+  부산: "#6366f1",
+  울산: "#4f46e5",
+  대구: "#4338ca",
+  경남: "#3730a3",
+  경북: "#312e81",
+  광주: "#c7d2fe",
+  전남: "#a5b4fc",
+  전북: "#818cf8",
+  대전: "#6366f1",
+  세종: "#4f46e5",
+  충남: "#4338ca",
+  충북: "#3730a3",
+  강원: "#312e81",
+  제주: "#3730a3",
+  "기타/해외": "#cbd5e1",
 };
 
-// 전체 지역 목록
 const ALL_REGIONS = [
   "서울",
   "경기",
@@ -94,10 +76,8 @@ const ALL_REGIONS = [
 ];
 
 function ResidenceDistributionChart({ panels = [] }) {
-  // 🎯 선택된 지역권 상태 (null이면 전체 보기)
   const [selectedGroup, setSelectedGroup] = useState(null);
 
-  // ✅ 지역별 집계
   const regionCounts = useMemo(() => {
     const counts = ALL_REGIONS.reduce((acc, region) => {
       acc[region] = 0;
@@ -114,7 +94,6 @@ function ResidenceDistributionChart({ panels = [] }) {
     return counts;
   }, [panels]);
 
-  // 📊 지역권별 데이터 (파이 차트용)
   const groupData = useMemo(() => {
     const groupCounts = {};
 
@@ -129,7 +108,6 @@ function ResidenceDistributionChart({ panels = [] }) {
       .filter((d) => d.value > 0);
   }, [regionCounts]);
 
-  // 📊 선택된 지역권의 상세 데이터 (막대 차트용)
   const detailData = useMemo(() => {
     if (!selectedGroup) return [];
 
@@ -142,34 +120,22 @@ function ResidenceDistributionChart({ panels = [] }) {
       .filter((d) => d.value > 0);
   }, [selectedGroup, regionCounts]);
 
-  // 🔙 뒤로가기 핸들러
   const handleBack = () => {
     setSelectedGroup(null);
   };
 
-  // 🖱️ 파이 차트 클릭 핸들러
   const handlePieClick = (data) => {
     setSelectedGroup(data.name);
   };
 
   return (
     <div className="flex flex-col bg-white border border-slate-300 rounded-lg p-6 shadow-sm">
-      {/* 📊 차트 제목 및 아이콘 */}
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="flex items-center space-x-3">
-          <img
-            src={residencePng}
-            height="60px"
-            width="60px"
-            alt="거주지 분포"
-            className="object-contain"
-          />
-          <span className="text-indigo-700 font-medium">
-            {selectedGroup ? `[${selectedGroup} 상세 분포]` : "[거주지 분포]"}
-          </span>
+      <div className="flex items-center justify-between mb-6">
+        <h3 className="text-3xl font-bold text-indigo-900">
+          {selectedGroup ? `${selectedGroup} 상세 분포` : "거주지 분포"}
         </h3>
 
-        {/* 🔙 뒤로가기 버튼 */}
+        {/* 뒤로가기 버튼 */}
         {selectedGroup && (
           <button
             onClick={handleBack}
@@ -183,7 +149,6 @@ function ResidenceDistributionChart({ panels = [] }) {
 
       {/* 📈 차트 영역 */}
       {!selectedGroup ? (
-        // 🥧 지역권별 파이 차트
         <div className="flex justify-center">
           <ResponsiveContainer width="100%" height={350}>
             <PieChart>
@@ -212,7 +177,7 @@ function ResidenceDistributionChart({ panels = [] }) {
                 formatter={(value) => [`${value}명`, "인원"]}
                 contentStyle={{
                   backgroundColor: "white",
-                  border: "1px solid #cbd5e1", // slate-300
+                  border: "1px solid #cbd5e1",
                   borderRadius: "8px",
                 }}
               />
@@ -220,19 +185,17 @@ function ResidenceDistributionChart({ panels = [] }) {
           </ResponsiveContainer>
         </div>
       ) : (
-        // 📊 상세 지역별 막대 차트
         <div className="flex justify-center">
           <ResponsiveContainer width="100%" height={350}>
             <BarChart
               data={detailData}
               margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
             >
-              <CartesianGrid strokeDasharray="3 3" stroke="#e0e7ff" />{" "}
-              {/* indigo-100 */}
+              <CartesianGrid strokeDasharray="3 3" stroke="#e0e7ff" />
               <XAxis
                 dataKey="name"
-                tick={{ fill: "#4338ca" }} /* indigo-700 */
-                axisLine={{ stroke: "#a5b4fc" }} /* indigo-300 */
+                tick={{ fill: "#4338ca" }}
+                axisLine={{ stroke: "#a5b4fc" }}
               />
               <YAxis
                 tick={{ fill: "#4338ca" }}
@@ -272,7 +235,6 @@ function ResidenceDistributionChart({ panels = [] }) {
         </div>
       )}
 
-      {/* 💡 안내 메시지 */}
       {!selectedGroup && (
         <p className="text-center text-indigo-900 text-sm mt-4">
           💡 지역권을 클릭하면 상세 지역별 인원수를 확인할 수 있습니다

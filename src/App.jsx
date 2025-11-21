@@ -6,6 +6,7 @@ import TestPage from "./pages/TestPage";
 import ResultPage from "./pages/ResultPage";
 import RelatedSearchPage from "@/pages/RelatedSearchPage";
 import CommonPage from "@/pages/CommonPage";
+import NoResultPage from "@/pages/NoResultPage"; // 추가
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
           <Route path={routes.result} element={<ResultPage />} />
           <Route path={routes.resultex} element={<RelatedSearchPage />} />
           <Route path={routes.common} element={<CommonPage />} />
+          <Route path={routes.noResult} element={<NoResultPage />} />
         </Routes>
       </Router>
     </>

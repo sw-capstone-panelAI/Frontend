@@ -78,25 +78,46 @@ export default function ResultPage() {
       const response = await fetch("http://localhost:5000/api/export-csv", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ panels: filteredPanels }),
+        body: JSON.stringify({
+          panels: filteredPanels,
+          query: originalQuery,
+        }),
       });
+
       if (!response.ok) throw new Error("CSV 다운로드 실패");
+
+      // 쿼리명 처리: 특수문자 제거, 길이 제한 50자
+      let safeQuery = originalQuery
+        .replace(/[^\w\sㄱ-힣]/g, "") // 특수문자 제거 (한글, 영문, 숫자, 공백만)
+        .replace(/\s+/g, "_") // 공백을 언더스코어로 변환
+        .substring(0, 50) // 50자로 제한 (20자 → 50자)
+        .trim();
+
+      // 빈 문자열 방지
+      if (!safeQuery) {
+        safeQuery = "패널데이터";
+      }
+
+      // 날짜 추가
+      const today = new Date().toISOString().split("T")[0];
+      const filename = `${safeQuery}_${today}.csv`;
+
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = `패널데이터_${new Date().toISOString().split("T")[0]}.csv`;
+      a.download = filename;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
       window.URL.revokeObjectURL(url);
-      console.log("✅ CSV 다운로드 완료");
+
+      console.log(`✅ CSV 다운로드 완료: ${filename}`);
     } catch (error) {
       console.error("❌ CSV 다운로드 오류:", error);
       alert("CSV 다운로드 중 오류가 발생했습니다.");
     }
   };
-
   const headerHeight = "88px";
 
   return (
@@ -135,11 +156,14 @@ export default function ResultPage() {
               <button
                 onClick={handleDownloadCSV}
                 disabled={filteredPanels.length === 0}
-                className="w-full mt-3 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-white rounded-lg flex items-center justify-center gap-2 transition-colors"
+                className="w-full mt-3 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-blue-900 rounded-lg flex items-center justify-center gap-2 transition-colors"
               >
                 <Download className="w-5 h-5" />
                 <span>CSV 다운로드</span>
               </button>
+
+              {/* 왼쪽 리스트 섹션 수정 - overflow-y-auto를 overflow-y-scroll overflow-x-visible로 변경은 안됨 */}
+              {/* 대신 툴팁을 아래쪽으로 표시하도록 변경 */}
 
               <div className="flex items-center justify-between mt-3 mb-1">
                 <div className="flex items-center">
@@ -147,14 +171,16 @@ export default function ResultPage() {
                   <p className="text-indigo-800">신뢰도 필터 기능</p>
                 </div>
                 <div className="relative group">
-                  <div className="w-5 h-5 rounded-full bg-indigo-500 text-white text-xs flex items-center justify-center cursor-help">
+                  <div className="w-6 h-6 rounded-full bg-indigo-500 text-white text-sm flex items-center justify-center cursor-help font-bold">
                     ?
                   </div>
-                  <div className="absolute right-0 top-6 w-64 bg-white border-2 border-indigo-300 rounded-lg shadow-lg p-3 invisible group-hover:visible z-50">
-                    <p className="text-xs text-gray-700 leading-relaxed">
-                      <span className="font-bold text-indigo-700">
+                  {/* 툴팁을 왼쪽 아래로 표시 */}
+                  <div className="absolute right-0 top-8 w-72 bg-white border-2 border-indigo-300 rounded-xl shadow-2xl p-5 invisible group-hover:visible z-[9999]">
+                    <p className="text-sm text-gray-700 leading-relaxed">
+                      <span className="font-bold text-indigo-700 text-base">
                         신뢰도란?
                       </span>
+                      <br />
                       <br />
                       패널 응답의 일관성과 정확성을 평가한 점수입니다.
                       나이·직업·차량정보 등의 논리적 모순을 검사하여 100점
@@ -163,7 +189,6 @@ export default function ResultPage() {
                   </div>
                 </div>
               </div>
-
               <Dropdown
                 options={[
                   { label: "100% (정확히 100점)", value: "100" },
@@ -227,7 +252,10 @@ export default function ResultPage() {
               패널 상세 정보
             </p>
             <div className="mb-10">
-              <PanelDetailView selectedPanel={selectedPanel} />
+              <PanelDetailView
+                selectedPanel={selectedPanel}
+                searchQuery={originalQuery}
+              />
             </div>
 
             <p className="flex ml-7 mb-3 pt-2 font-bold text-2xl border-t border-indigo-200 text-indigo-800">
