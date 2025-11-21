@@ -43,6 +43,7 @@ export default function SearchingPage() {
       return;
     }
 
+    // SearchingPage.jsx - fetchData 함수 수정
     async function fetchData() {
       try {
         console.log("검색 요청:", query);
@@ -56,12 +57,19 @@ export default function SearchingPage() {
         if (isMounted) {
           setTimeout(
             () => {
-              navigate(routes.result, {
-                state: {
-                  query,
-                  result: res.data,
-                },
-              });
+              // 결과가 없으면 NoResultPage로 이동
+              if (!res.data.panels || res.data.panels.length === 0) {
+                navigate(routes.noResult, {
+                  state: { query },
+                });
+              } else {
+                navigate(routes.result, {
+                  state: {
+                    query,
+                    result: res.data,
+                  },
+                });
+              }
             },
             steps.reduce((t, s) => t + s.duration, 0)
           );

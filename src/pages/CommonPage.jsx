@@ -192,7 +192,7 @@ export default function CommonPage() {
             </div>
 
             <div className="bg-indigo-50/70 rounded-lg p-5 border-2 border-indigo-200">
-              <p className="text-gray-800 leading-relaxed whitespace-pre-line">
+              <p className="text-lg text-gray-800 leading-relaxed whitespace-pre-line">
                 {summary}
               </p>
             </div>
