@@ -3,6 +3,7 @@ import { Loader2, Sparkles, ArrowLeft, X, AlertCircle } from "lucide-react";
 import HeaderBar from "@common/bar/HeaderBar";
 import { useLocation, useNavigate } from "react-router-dom";
 import routes from "@utils/constants/routes";
+import axios from "axios";
 
 /**
  * 마인드맵 노드 위치 및 중앙 위치 (6개로 조정)
@@ -138,67 +139,55 @@ export default function App() {
 
   const { query: originalQuery } = location.state || {};
 
-  useEffect(() => {
-    // 랜덤 키워드 생성 함수 (6개만 생성)
-    const generateRandomKeywords = () => {
-      const genders = ["남성", "여성"];
-      const ages = ["10대", "20대", "30대", "40대", "50대", "60대"];
-      const regions = [
-        "서울",
-        "부산",
-        "경기",
-        "인천",
-        "대구",
-        "광주",
-        "대전",
-        "울산",
-        "세종",
-        "강원",
-        "충북",
-        "충남",
-        "전북",
-        "전남",
-        "경북",
-        "경남",
-        "제주",
-      ];
-      const incomes = [
-        "월 100만원 미만",
-        "월 100~199만원",
-        "월 200~299만원",
-        "월 300~399만원",
-        "월 400~499만원",
-        "월 500~599만원",
-        "월 600~699만원",
-        "월 700만원이상",
-      ];
-      const maritalStatuses = ["기혼", "미혼"];
-      const carOwnerships = ["차량 보유", "차량 미보유"];
+  // 백엔드에서 추천어 생성요청
+  async function fetchKeyword(originalQuery) {
+    try {
+      console.log("키워드 생성 요청: ", { originalQuery });
 
-      const randomGender = genders[Math.floor(Math.random() * genders.length)];
-      const randomAge = ages[Math.floor(Math.random() * ages.length)];
-      const randomRegion = regions[Math.floor(Math.random() * regions.length)];
-      const randomIncome = incomes[Math.floor(Math.random() * incomes.length)];
-      const randomMarital =
-        maritalStatuses[Math.floor(Math.random() * maritalStatuses.length)];
-      const randomCar =
-        carOwnerships[Math.floor(Math.random() * carOwnerships.length)];
+      const res = await axios.post(
+        "http://localhost:5000/api/related-keywords",
+        {
+          query: originalQuery,
+        }
+      );
 
-      // 6개만 반환
-      return [
-        { text: randomGender },
-        { text: randomAge },
-        { text: randomRegion },
-        { text: randomIncome },
-        { text: randomMarital },
-        { text: randomCar },
-      ];
-    };
-
-    setTimeout(() => {
-      setRelatedQueries(generateRandomKeywords());
+      console.log("생성된 추천어:", res.data);
+      setRelatedQueries(res.data);
       setLoading(false);
-    }, 1500);
+    } catch (err) {
+      console.error("요청 실패:", err);
+      alert("키워드 생성 중 오류가 발생했습니다. 다시 시도해주세요.");
+      navigate(-1);
+    }
+  }
+
+  // 백엔드에서 추천어 기반으로 문장 생성 요청
+  async function fetchNewQuery(originalQuery, selectedQueries) {
+    try {
+      console.log("추천어기반 쿼리생성 요청: ", { selectedQueries });
+
+      const res = await axios.post(
+        "http://localhost:5000/api/keywords-newQuery",
+        {
+          query: originalQuery,
+          keywords: selectedQueries,
+        }
+      );
+
+      console.log("생성된 추천어:", res.data);
+      setRecommendedQuery(res.data.query);
+      setLoading(false);
+    } catch (err) {
+      console.error("요청 실패:", err);
+      alert("키워드 생성 중 오류가 발생했습니다. 다시 시도해주세요.");
+      navigate(-1);
+    }
+  }
+
+  // 마운트시 1번만 실행
+  useEffect(() => {
+    // 백엔드에 키워드 생성 요청
+    fetchKeyword(originalQuery);
   }, []);
 
   // Toast 자동 숨김 효과
@@ -236,20 +225,8 @@ export default function App() {
   };
 
   const generateQuery = () => {
-    setRecommendedQuery("");
     setLoading(true);
-
-    setTimeout(() => {
-      let newQuery;
-      if (selectedQueries.length > 0) {
-        newQuery = selectedQueries.join(" ") + " 패널";
-      } else {
-        const top3 = relatedQueries.slice(0, 3).map((q) => q.text);
-        newQuery = top3.join(" ") + " 패널";
-      }
-      setRecommendedQuery(newQuery);
-      setLoading(false);
-    }, 800);
+    fetchNewQuery(originalQuery, selectedQueries);
   };
 
   const handleSearch = () => {
