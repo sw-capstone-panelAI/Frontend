@@ -28,7 +28,7 @@ import AiFeatButton from "@components/common/button/AiFeatButton";
 export default function ResultPage() {
   const location = useLocation();
   const { query: originalQuery, result } = location.state || {};
-  const { panels: rawPanels = [], words = [] } = result || {};
+  const { panels: rawPanels = [] } = result || {};
 
   const navigate = useNavigate();
 
