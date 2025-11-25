@@ -34,7 +34,7 @@ export function SearchInput({
           onClick={onSearch}
           disabled={disabled || !value.trim()}
           className="absolute right-3 top-1/2 -translate-y-1/2 p-2.5
-                     bg-indigo-600 text-white rounded-lg
+                     bg-indigo-600 text-indigo-800 rounded-lg
                      hover:bg-indigo-700 transition-colors
                      disabled:opacity-50 disabled:cursor-not-allowed"
         >
