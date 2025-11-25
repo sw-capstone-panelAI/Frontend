@@ -46,6 +46,16 @@ export default function ResultPage() {
 
   function onSearch() {
     if (!newQuery?.trim()) return;
+
+    // 히스토리에 추가 (중복 제거)
+    const savedHistory = localStorage.getItem("searchHistory");
+    const searchHistory = savedHistory ? JSON.parse(savedHistory) : [];
+    const newHistory = [
+      newQuery,
+      ...searchHistory.filter((h) => h !== newQuery),
+    ].slice(0, 10); // 최대 10개
+    localStorage.setItem("searchHistory", JSON.stringify(newHistory));
+
     navigate(routes.search, { state: { query: `${newQuery}` } });
   }
 

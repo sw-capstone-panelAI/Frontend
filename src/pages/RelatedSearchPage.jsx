@@ -231,6 +231,15 @@ export default function App() {
 
   const handleSearch = () => {
     if (recommendedQuery) {
+      // 히스토리에 추가 (중복 제거)
+      const savedHistory = localStorage.getItem("searchHistory");
+      const searchHistory = savedHistory ? JSON.parse(savedHistory) : [];
+      const newHistory = [
+        recommendedQuery,
+        ...searchHistory.filter((h) => h !== recommendedQuery),
+      ].slice(0, 10); // 최대 10개
+      localStorage.setItem("searchHistory", JSON.stringify(newHistory));
+
       // 모달 없이 바로 라우팅
       navigate(routes.search, { state: { query: recommendedQuery } });
     }
