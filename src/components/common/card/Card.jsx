@@ -630,18 +630,6 @@ export function PanelDetailView({ selectedPanel, searchQuery = "" }) {
               <h3 className="text-lg font-bold text-indigo-900">
                 패널 ID: {selectedPanel.mbSn}
               </h3>
-              {searchQuery && (
-                <div className="flex items-center gap-2 mt-1">
-                  <Search className="w-4 h-4 text-yellow-600" />
-                  <p className="text-xs text-gray-600">
-                    검색어: "
-                    <span className="font-semibold">{searchQuery}</span>" -
-                    매칭된 항목이{" "}
-                    <span className="font-bold text-yellow-700">노란색</span>
-                    으로 표시됩니다
-                  </p>
-                </div>
-              )}
             </div>
           </div>
 

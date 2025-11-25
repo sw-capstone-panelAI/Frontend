@@ -40,6 +40,16 @@ export default function NoResultPage() {
 
   const onSearch = () => {
     if (!query.trim()) return;
+
+    // 히스토리에 추가 (중복 제거)
+    const savedHistory = localStorage.getItem("searchHistory");
+    const searchHistory = savedHistory ? JSON.parse(savedHistory) : [];
+    const newHistory = [
+      query,
+      ...searchHistory.filter((h) => h !== query),
+    ].slice(0, 10); // 최대 10개
+    localStorage.setItem("searchHistory", JSON.stringify(newHistory));
+
     navigate(routes.search, { state: { query } });
   };
 
@@ -65,6 +75,15 @@ export default function NoResultPage() {
   ];
 
   const handleSuggestionClick = (suggestedQuery) => {
+    // 히스토리에 추가 (중복 제거)
+    const savedHistory = localStorage.getItem("searchHistory");
+    const searchHistory = savedHistory ? JSON.parse(savedHistory) : [];
+    const newHistory = [
+      suggestedQuery,
+      ...searchHistory.filter((h) => h !== suggestedQuery),
+    ].slice(0, 10);
+    localStorage.setItem("searchHistory", JSON.stringify(newHistory));
+
     navigate(routes.search, { state: { query: suggestedQuery } });
   };
 

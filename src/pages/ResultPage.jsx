@@ -46,6 +46,16 @@ export default function ResultPage() {
 
   function onSearch() {
     if (!newQuery?.trim()) return;
+
+    // 히스토리에 추가 (중복 제거)
+    const savedHistory = localStorage.getItem("searchHistory");
+    const searchHistory = savedHistory ? JSON.parse(savedHistory) : [];
+    const newHistory = [
+      newQuery,
+      ...searchHistory.filter((h) => h !== newQuery),
+    ].slice(0, 10); // 최대 10개
+    localStorage.setItem("searchHistory", JSON.stringify(newHistory));
+
     navigate(routes.search, { state: { query: `${newQuery}` } });
   }
 
@@ -56,6 +66,9 @@ export default function ResultPage() {
     let newPanels;
     if (filterValue === 100) {
       newPanels = rawPanels.filter((p) => p.reliability === 100);
+    } else if (filterValue === 99) {
+      // 이 조건문 추가
+      newPanels = rawPanels.filter((p) => p.reliability < 100);
     } else if (filterValue === 0) {
       newPanels = [...rawPanels];
     } else {
@@ -128,7 +141,14 @@ export default function ResultPage() {
           <p className="px-2 py-1 mr-2 bg-white border-2 border-indigo-300 rounded-xl text-indigo-700 text-sm">
             입력 쿼리
           </p>
-          <span className="text-indigo-800 text-base">{originalQuery}</span>
+          <span
+            className="text-indigo-800 text-base truncate"
+            title={originalQuery}
+          >
+            {originalQuery.length > 40
+              ? `${originalQuery.substring(0, 40)}...`
+              : originalQuery}
+          </span>
         </div>
         <SearchInput
           value={newQuery}
@@ -192,6 +212,7 @@ export default function ResultPage() {
               <Dropdown
                 options={[
                   { label: "100% (정확히 100점)", value: "100" },
+                  { label: "100% 미만", value: "99" },
                   { label: "75% 이상", value: "75" },
                   { label: "50% 이상", value: "50" },
                   { label: "25% 이상", value: "25" },
