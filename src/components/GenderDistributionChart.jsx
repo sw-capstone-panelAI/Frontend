@@ -1,34 +1,49 @@
-// 성별 분포 차트 (호환성 유지, 번역 포함)
 import React from "react";
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";
 
-function GenderDistributionChart({ stats }) {
+function GenderDistributionChart({ panels }) {
+  const maleCount = panels.filter((p) => p.gender === "남성").length;
+  const femaleCount = panels.filter((p) => p.gender === "여성").length;
+
   return (
-    <div className="bg-card border border-border rounded-lg p-6">
-      <h3 className="mb-4">[translate:성별 분포]</h3>
-      <ResponsiveContainer width="100%" height={250}>
-        <PieChart>
-          <Pie
-            data={[
-              { name: "[translate:남성]", value: stats.male },
-              { name: "[translate:여성]", value: stats.female },
-            ]}
-            cx="50%"
-            cy="50%"
-            labelLine={false}
-            label={({ name, percent }) =>
-              `${name} ${(percent * 100).toFixed(0)}%`
-            }
-            outerRadius={80}
-            dataKey="value"
-          >
-            <Cell fill="#8b5cf6" />
-            <Cell fill="#06b6d4" />
-          </Pie>
-          <Tooltip />
-        </PieChart>
-      </ResponsiveContainer>
+    <div className="flex flex-col bg-white border border-slate-300 rounded-lg p-6 shadow-sm">
+      <div className="mb-6">
+        <h3 className="text-3xl font-bold text-indigo-900"> 성별 분포</h3>
+      </div>
+
+      <div className="flex justify-center">
+        <ResponsiveContainer width="100%" height={350}>
+          <PieChart>
+            <Pie
+              data={[
+                { name: "남성", value: maleCount },
+                { name: "여성", value: femaleCount },
+              ]}
+              cx="50%"
+              cy="50%"
+              labelLine={false}
+              label={({ name, percent }) =>
+                `${name} ${(percent * 100).toFixed(0)}%`
+              }
+              outerRadius={120}
+              dataKey="value"
+            >
+              <Cell fill="#4f46e5" />
+              <Cell fill="#64748b" />
+            </Pie>
+            <Tooltip
+              formatter={(value) => [`${value}명`, "인원"]}
+              contentStyle={{
+                backgroundColor: "white",
+                border: "1px solid #cbd5e1",
+                borderRadius: "8px",
+              }}
+            />
+          </PieChart>
+        </ResponsiveContainer>
+      </div>
     </div>
   );
 }
+
 export default GenderDistributionChart;
