@@ -3,17 +3,20 @@ import { ChevronRight, ChevronLeft, X } from "lucide-react";
 
 import Graph from "@assets/Graph.png";
 import PanelData from "@assets/PanelData.png";
-import PanelData2 from "@assets/PanelData2.png";
 import ResultPage1 from "@assets/ResultPage1.png";
 import ReliabilityFilter from "@assets/ReliabilityFilter.png";
 import RelatedSearchPage from "@assets/RelatedSearchPage.png";
 import Main from "@assets/Main.png";
 import Searching from "@assets/Searching.png";
+import History from "@assets/history.png";
+import NoDataPage from "@assets/NodataPage.png";
+import Common from "@assets/Common.png";
 
 const guideSlides = [
   {
     title: "PanelFinder에 오신 것을 환영합니다! 🎉",
-    description: "자연어로 원하는 패널을 쉽게 찾 수 있는 AI 검색 서비스입니다.",
+    description:
+      "자연어로 원하는 패널을 쉽게 찾을 수 있는 AI 검색 서비스입니다.",
     page: "welcome",
     tooltips: [],
   },
@@ -36,6 +39,33 @@ const guideSlides = [
         position: "bottom",
         text: "Enter 키 또는 검색 버튼을 눌러 검색을 시작하세요",
         icon: "🔍",
+      },
+    ],
+  },
+  {
+    title: "1-1단계: 검색 히스토리 활용하기",
+    description: "이전에 검색했던 내역을 빠르게 다시 검색할 수 있습니다.",
+    page: "history",
+    tooltips: [
+      {
+        position: "left",
+        text: "왼쪽 버튼을 클릭하면 검색 히스토리 사이드바가 열립니다",
+        icon: "📜",
+      },
+      {
+        position: "history-list",
+        text: "최근 검색한 내역이 최대 10개까지 저장됩니다",
+        icon: "🕐",
+      },
+      {
+        position: "quick-search",
+        text: "히스토리 항목을 클릭하면 바로 해당 검색을 다시 실행할 수 있어요",
+        icon: "⚡",
+      },
+      {
+        position: "delete",
+        text: "개별 항목을 삭제하거나 전체 히스토리를 지울 수 있습니다",
+        icon: "🗑️",
       },
     ],
   },
@@ -90,7 +120,35 @@ const guideSlides = [
     ],
   },
   {
-    title: "3-2단계: 패널 상세 정보",
+    title: "3-2단계: 공통 특성 분석",
+    description:
+      "마케팅 전문가를 위한 기능! AI가 검색된 패널들의 공통점을 자동으로 분석합니다.",
+    page: "common",
+    tooltips: [
+      {
+        position: "top",
+        text: "마케팅 타겟 설정에 유용한 인사이트를 제공합니다",
+        icon: "🎯",
+      },
+      {
+        position: "analysis",
+        text: "연령대, 지역, 소비 패턴 등 패널들의 주요 공통점을 파악합니다",
+        icon: "📊",
+      },
+      {
+        position: "marketing",
+        text: "마케팅 캠페인 기획 시 타겟 세그먼트 이해에 활용하세요",
+        icon: "💼",
+      },
+      {
+        position: "insight",
+        text: "AI가 발견한 패턴을 통해 새로운 마케팅 기회를 발견할 수 있습니다",
+        icon: "💡",
+      },
+    ],
+  },
+  {
+    title: "3-3단계: 패널 상세 정보",
     description: "선택한 패널의 모든 정보를 자세히 확인할 수 있습니다.",
     page: "result-2",
     tooltips: [
@@ -101,40 +159,18 @@ const guideSlides = [
       },
       {
         position: "tendency",
-        text: "고객성향: 구매 패턴, 선호도 등 소비 성향 정보",
+        text: "고객성향: 월평균 소득/지출, 구매 패턴, 선호 브랜드, 쇼핑 성향 등",
         icon: "🎯",
       },
       {
         position: "reliability",
-        text: "신뢰도만족: 데이터 신뢰도 점수와 감점 사유 확인",
+        text: "신뢰도만족: 응답 일관성, 논리적 오류, 상식 위배, 중복 응답 등의 감점 사유",
         icon: "⭐",
       },
       {
         position: "additional",
-        text: "기타 추가정보: 직업, 학력, 관심사 등 상세 정보",
+        text: "기타 추가정보: 직업, 학력, 결혼 여부, 취미, 관심사, 라이프스타일 등",
         icon: "➕",
-      },
-    ],
-  },
-  {
-    title: "3-3단계: 패널 상세 정보 - 세부 내용",
-    description: "각 카테고리에 포함된 구체적인 정보들을 확인할 수 있습니다.",
-    page: "result-2-detail",
-    tooltips: [
-      {
-        position: "tendency",
-        text: "월평균 소득, 월평균 지출, 주 구매 품목, 구매 빈도, 선호 브랜드, 쇼핑 성향 등",
-        icon: "🎯",
-      },
-      {
-        position: "reliability",
-        text: "응답 일관성 점수, 논리적 오류 감점, 상식 위배 감점, 중복 응답 감점 등의 세부 사유",
-        icon: "⚠️",
-      },
-      {
-        position: "additional",
-        text: "직업, 학력, 결혼 여부, 자녀 수, 취미, 관심사, 라이프스타일, 건강 정보 등",
-        icon: "📋",
       },
     ],
   },
@@ -208,6 +244,29 @@ const guideSlides = [
     ],
   },
   {
+    title: "검색 결과가 없을 때",
+    description:
+      "조건에 맞는 패널이 없어도 걱정하지 마세요. 검색어를 조정해보세요.",
+    page: "nodata",
+    tooltips: [
+      {
+        position: "message",
+        text: "검색 조건을 만족하는 패널이 없을 때 표시됩니다",
+        icon: "🔍",
+      },
+      {
+        position: "suggestion",
+        text: "검색어를 더 넓게 조정하거나 다른 조건으로 시도해보세요",
+        icon: "💡",
+      },
+      {
+        position: "tips",
+        text: "예: '서울 20대' → '수도권 20~30대'로 범위를 확장",
+        icon: "✨",
+      },
+    ],
+  },
+  {
     title: "이제 시작해보세요! 🚀",
     description: "PanelFinder로 원하는 패널을 쉽고 빠르게 찾아보세요!",
     page: "finish",
@@ -219,176 +278,212 @@ function renderPageMockup(pageType) {
   switch (pageType) {
     case "welcome":
       return (
-        <div className="h-full flex items-center justify-center">
-          <div className="bg-gradient-to-br from-emerald-100 to-teal-100 rounded-xl p-12 text-center space-y-6">
-            <div className="text-6xl animate-bounce">🎉</div>
-            <h3 className="text-4xl font-bold bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">
+        <div className="h-full flex items-center justify-center bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50">
+          <div className="bg-white rounded-2xl p-16 text-center space-y-8 shadow-2xl border-2 border-indigo-200">
+            <div className="text-7xl animate-bounce">🎉</div>
+            <h3 className="text-5xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
               PanelFinder
             </h3>
-            <p className="text-gray-700 text-lg">AI 기반 패널 검색 서비스</p>
-            <div className="flex justify-center gap-6 text-4xl">
-              <span>💬</span>
-              <span>🤖</span>
-              <span>📊</span>
+            <p className="text-gray-700 text-xl font-medium">
+              AI 기반 패널 검색 서비스
+            </p>
+            <div className="flex justify-center gap-8 text-5xl">
+              <span className="animate-pulse">💬</span>
+              <span className="animate-pulse delay-100">🤖</span>
+              <span className="animate-pulse delay-200">📊</span>
             </div>
           </div>
         </div>
       );
+
     case "main":
       return (
-        <div className="h-full overflow-y-auto">
-          <div className="bg-gradient-to-br from-white via-emerald-50 to-teal-50 rounded-xl">
-            <div className="p-4">
-              <div className="relative flex justify-center">
-                <img
-                  src={Main}
-                  alt="메인 페이지"
-                  className="max-w-full rounded-xl shadow-lg border-2 border-emerald-200"
-                />
-              </div>
-              {/* 하단 설명 카드 등 필요한 UI 복사 가능 */}
-            </div>
+        <div className="h-full overflow-y-auto bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50">
+          <div className="p-6">
+            <img
+              src={Main}
+              alt="메인 페이지"
+              className="w-full h-auto rounded-xl shadow-2xl border-2 border-indigo-300"
+            />
           </div>
         </div>
       );
+
+    case "history":
+      return (
+        <div className="h-full overflow-y-auto bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50">
+          <div className="p-6">
+            <img
+              src={History}
+              alt="검색 히스토리"
+              className="w-full h-auto rounded-xl shadow-2xl border-2 border-indigo-300"
+            />
+          </div>
+        </div>
+      );
+
     case "searching":
       return (
-        <div className="h-full overflow-y-auto">
-          <div className="bg-gradient-to-br from-white via-emerald-50 to-teal-50 rounded-xl">
-            <div className="p-4">
-              <div className="relative flex justify-center">
-                <img
-                  src={Searching}
-                  alt="검색 중 페이지"
-                  className="max-w-full rounded-xl shadow-lg border-2 border-emerald-200"
-                />
-              </div>
-              {/* 하단 설명 카드 */}
-            </div>
+        <div className="h-full overflow-y-auto bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50">
+          <div className="p-6">
+            <img
+              src={Searching}
+              alt="검색 중 페이지"
+              className="w-full h-auto rounded-xl shadow-2xl border-2 border-indigo-300"
+            />
           </div>
         </div>
       );
+
     case "result-1":
       return (
-        <div className="h-full overflow-y-auto">
-          <div className="bg-gradient-to-br from-white via-emerald-50 to-teal-50 rounded-xl">
-            <div className="p-4">
-              <div className="relative flex justify-center">
-                <img
-                  src={ResultPage1}
-                  alt="패널 목록 및 AI 활용 기능"
-                  className="max-w-full rounded-xl shadow-lg border-2 border-emerald-200"
-                />
-              </div>
-              {/* 말풍선 및 기타 UI */}
-            </div>
+        <div className="h-full overflow-y-auto bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50">
+          <div className="p-6">
+            <img
+              src={ResultPage1}
+              alt="패널 목록 및 AI 활용 기능"
+              className="w-full h-auto rounded-xl shadow-2xl border-2 border-indigo-300"
+            />
           </div>
         </div>
       );
+
+    case "common":
+      return (
+        <div className="h-full overflow-y-auto bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50">
+          <div className="p-6">
+            <div className="mb-4 bg-white rounded-lg p-4 shadow-md border-2 border-indigo-300">
+              <div className="flex items-center gap-3 mb-2">
+                <span className="text-2xl">💼</span>
+                <h4 className="text-lg font-bold text-gray-800">
+                  마케팅 전문가를 위한 인사이트
+                </h4>
+              </div>
+              <p className="text-sm text-gray-600">
+                타겟 고객층의 공통점을 파악하여 효과적인 마케팅 전략을
+                수립하세요
+              </p>
+            </div>
+            <img
+              src={Common}
+              alt="공통 특성 분석"
+              className="w-full h-auto rounded-xl shadow-2xl border-2 border-indigo-300"
+            />
+          </div>
+        </div>
+      );
+
     case "result-2":
       return (
-        <div className="h-full overflow-y-auto">
-          <div className="bg-gradient-to-br from-white via-emerald-50 to-teal-50 rounded-xl">
-            <div className="p-4">
-              <div className="relative flex justify-center">
-                <img
-                  src={PanelData}
-                  alt="패널 상세 정보"
-                  className="max-w-full rounded-xl shadow-lg border-2 border-emerald-200"
-                />
-              </div>
-              {/* 추가 UI */}
-            </div>
+        <div className="h-full overflow-y-auto bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50">
+          <div className="p-6">
+            <img
+              src={PanelData}
+              alt="패널 상세 정보"
+              className="w-full h-auto rounded-xl shadow-2xl border-2 border-indigo-300"
+            />
           </div>
         </div>
       );
-    case "result-2-detail":
-      return (
-        <div className="h-full overflow-y-auto">
-          <div className="bg-gradient-to-br from-white via-emerald-50 to-teal-50 rounded-xl">
-            <div className="p-4">
-              <div className="relative flex justify-center">
-                <img
-                  src={PanelData2}
-                  alt="패널 상세 정보 - 세부 내용"
-                  className="max-w-full rounded-xl shadow-lg border-2 border-emerald-200"
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-      );
+
     case "result-3":
       return (
-        <div className="h-full overflow-y-auto">
-          <div className="bg-gradient-to-br from-white via-emerald-50 to-teal-50 rounded-xl">
-            <div className="p-4">
-              <div className="relative flex justify-center">
-                <img
-                  src={ReliabilityFilter}
-                  alt="신뢰도 필터 기능"
-                  className="max-w-full rounded-xl shadow-lg border-2 border-emerald-200"
-                />
-              </div>
-            </div>
+        <div className="h-full overflow-y-auto bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50">
+          <div className="p-6">
+            <img
+              src={ReliabilityFilter}
+              alt="신뢰도 필터 기능"
+              className="w-full h-auto rounded-xl shadow-2xl border-2 border-indigo-300"
+            />
           </div>
         </div>
       );
+
     case "result-4":
       return (
-        <div className="h-full overflow-y-auto">
-          <div className="bg-gradient-to-br from-white via-emerald-50 to-teal-50 rounded-xl">
-            <div className="p-4">
-              <div className="relative flex justify-center">
-                <img
-                  src={Graph}
-                  alt="패널 주요 정보 시각화"
-                  className="max-w-full rounded-xl shadow-lg border-2 border-emerald-200"
-                />
-              </div>
-            </div>
+        <div className="h-full overflow-y-auto bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50">
+          <div className="p-6">
+            <img
+              src={Graph}
+              alt="패널 주요 정보 시각화"
+              className="w-full h-auto rounded-xl shadow-2xl border-2 border-indigo-300"
+            />
           </div>
         </div>
       );
+
     case "related":
       return (
-        <div className="h-full overflow-y-auto">
-          <div className="bg-gradient-to-br from-emerald-50 to-teal-50 rounded-xl">
-            <div className="p-4 space-y-3">
-              <div className="space-y-1">
-                <h4 className="text-xs text-emerald-700">원본 검색어</h4>
-                <div className="bg-white border border-emerald-200 rounded px-3 py-1 text-sm">
-                  서울 20대 남자 100명
-                </div>
+        <div className="h-full overflow-y-auto bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50">
+          <div className="p-6">
+            <div className="mb-4 space-y-2">
+              <h4 className="text-sm font-semibold text-indigo-700">
+                원본 검색어
+              </h4>
+              <div className="bg-white border-2 border-indigo-300 rounded-lg px-4 py-2 text-base shadow-md">
+                서울 20대 남자 100명
               </div>
-              <div className="relative flex justify-center">
-                <img
-                  src={RelatedSearchPage}
-                  alt="연관 검색어 마인드맵"
-                  className="max-w-full rounded-xl shadow-lg border-2 border-emerald-200"
-                />
+            </div>
+            <img
+              src={RelatedSearchPage}
+              alt="연관 검색어 마인드맵"
+              className="w-full h-auto rounded-xl shadow-2xl border-2 border-indigo-300"
+            />
+          </div>
+        </div>
+      );
+
+    case "nodata":
+      return (
+        <div className="h-full overflow-y-auto bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50">
+          <div className="p-6">
+            <img
+              src={NoDataPage}
+              alt="검색 결과 없음"
+              className="w-full h-auto rounded-xl shadow-2xl border-2 border-indigo-300"
+            />
+            <div className="mt-4 bg-white rounded-lg p-4 shadow-md border-2 border-indigo-300">
+              <div className="flex items-center gap-3 mb-2">
+                <span className="text-2xl">💡</span>
+                <h4 className="text-lg font-bold text-gray-800">검색 팁</h4>
               </div>
+              <ul className="text-sm text-gray-600 space-y-1">
+                <li>• 검색 조건의 범위를 넓혀보세요</li>
+                <li>• 지역을 확장하거나 연령대를 늘려보세요</li>
+                <li>• 필수 조건을 줄이고 다시 시도해보세요</li>
+              </ul>
             </div>
           </div>
         </div>
       );
+
     case "finish":
       return (
-        <div className="h-full flex items-center justify-center">
-          <div className="bg-gradient-to-br from-emerald-100 to-teal-100 rounded-xl p-12 text-center space-y-6">
-            <div className="text-6xl">🚀</div>
-            <h3 className="text-3xl font-bold text-gray-900">준비 완료!</h3>
-            <p className="text-gray-700 text-lg">
+        <div className="h-full flex items-center justify-center bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50">
+          <div className="bg-white rounded-2xl p-16 text-center space-y-8 shadow-2xl border-2 border-indigo-200">
+            <div className="text-7xl animate-pulse">🚀</div>
+            <h3 className="text-4xl font-bold text-gray-900">준비 완료!</h3>
+            <p className="text-gray-700 text-xl font-medium">
               이제 PanelFinder를 사용해보세요
             </p>
-            <div className="space-y-2 text-sm text-gray-600">
-              <p>💡 구체적으로 입력할수록 더 정확한 결과</p>
-              <p>📊 통계 차트로 패널 특성 파악</p>
-              <p>🔄 연관 검색어로 다양한 탐색</p>
+            <div className="space-y-3 text-base text-gray-600 bg-indigo-50 rounded-lg p-6 border border-indigo-200">
+              <p className="flex items-center justify-center gap-2">
+                <span className="text-2xl">💡</span>
+                구체적으로 입력할수록 더 정확한 결과
+              </p>
+              <p className="flex items-center justify-center gap-2">
+                <span className="text-2xl">📊</span>
+                통계 차트로 패널 특성 파악
+              </p>
+              <p className="flex items-center justify-center gap-2">
+                <span className="text-2xl">🔄</span>
+                연관 검색어로 다양한 탐색
+              </p>
             </div>
           </div>
         </div>
       );
+
     default:
       return null;
   }
@@ -411,13 +506,14 @@ export default function GuideModal({ show, onClose, current, setCurrent }) {
 
   return (
     <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-auto">
-      <div className="bg-white rounded-2xl shadow-2xl max-w-7xl w-full relative border-4 border-emerald-500 my-8">
+      <div className="bg-white rounded-2xl shadow-2xl max-w-7xl w-full relative border-4 border-indigo-500 my-8">
         <button
           onClick={onClose}
           className="absolute top-4 right-4 p-2 rounded-full hover:bg-gray-100 transition-colors z-30 bg-white shadow-lg"
         >
           <X className="w-6 h-6 text-gray-600" />
         </button>
+
         <div className="p-8 pt-12">
           <h2 className="text-3xl font-extrabold text-gray-900 mb-2">
             {guideSlides[current].title}
@@ -425,22 +521,25 @@ export default function GuideModal({ show, onClose, current, setCurrent }) {
           <p className="text-lg text-gray-700 mb-6">
             {guideSlides[current].description}
           </p>
+
           <div
-            className="mb-6 h-[700px] overflow-y-auto border-2 border-gray-200 rounded-xl bg-gray-50"
+            className="mb-6 h-[600px] overflow-y-auto border-2 border-gray-200 rounded-xl bg-gray-50"
             ref={slideContainerRef}
           >
             {renderPageMockup(guideSlides[current].page)}
           </div>
+
           <div className="flex justify-center gap-2 mb-6">
             {guideSlides.map((_, idx) => (
               <div
                 key={idx}
                 className={`h-2 rounded-full transition-all ${
-                  idx === current ? "w-8 bg-emerald-600" : "w-2 bg-gray-300"
+                  idx === current ? "w-8 bg-indigo-600" : "w-2 bg-gray-300"
                 }`}
               />
             ))}
           </div>
+
           <div className="flex justify-between items-center">
             <button
               disabled={current === 0}
@@ -448,25 +547,27 @@ export default function GuideModal({ show, onClose, current, setCurrent }) {
               className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors ${
                 current === 0
                   ? "bg-gray-200 cursor-not-allowed text-gray-400"
-                  : "bg-emerald-100 text-emerald-800 border-2 border-emerald-600 hover:bg-emerald-200"
+                  : "bg-indigo-100 text-indigo-800 border-2 border-indigo-600 hover:bg-indigo-200"
               }`}
             >
               <ChevronLeft className="w-5 h-5" /> 이전
             </button>
+
             <span className="text-gray-600 font-medium">
               {current + 1} / {guideSlides.length}
             </span>
+
             {current < guideSlides.length - 1 ? (
               <button
                 onClick={nextSlide}
-                className="flex items-center gap-2 px-4 py-2 bg-emerald-100 text-emerald-800 rounded-lg border-2 border-emerald-600 hover:bg-emerald-200 font-medium transition-colors"
+                className="flex items-center gap-2 px-4 py-2 bg-indigo-100 text-indigo-800 rounded-lg border-2 border-indigo-600 hover:bg-indigo-200 font-medium transition-colors"
               >
                 다음 <ChevronRight className="w-5 h-5" />
               </button>
             ) : (
               <button
                 onClick={onClose}
-                className="flex items-center gap-2 px-6 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 font-bold transition-colors"
+                className="flex items-center gap-2 px-6 py-2 bg-indigo-600 text-indigo-600 rounded-lg hover:bg-indigo-700 font-bold transition-colors shadow-lg"
               >
                 시작하기 🚀
               </button>

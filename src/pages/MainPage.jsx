@@ -1,9 +1,18 @@
 import HeaderBar from "@common/bar/HeaderBar";
 import { SearchInput } from "@components/SearchInput";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import routes from "@utils/constants/routes";
 import { useNavigate } from "react-router-dom";
-import { HelpCircle, Sparkles, Users, TrendingUp } from "lucide-react";
+import {
+  HelpCircle,
+  Sparkles,
+  Users,
+  TrendingUp,
+  ChevronRight,
+  ChevronLeft,
+  History,
+  X,
+} from "lucide-react";
 
 import GuideModal from "@components/GuideModal";
 
@@ -14,8 +23,29 @@ function MainPage() {
   const [showGuide, setShowGuide] = useState(false);
   const [currentSlide, setCurrentSlide] = useState(0);
 
+  // 히스토리 관련 상태
+  const [showHistory, setShowHistory] = useState(false);
+  const [searchHistory, setSearchHistory] = useState([]);
+
+  // 컴포넌트 마운트 시 로컬스토리지에서 히스토리 불러오기
+  useEffect(() => {
+    const savedHistory = localStorage.getItem("searchHistory");
+    if (savedHistory) {
+      setSearchHistory(JSON.parse(savedHistory));
+    }
+  }, []);
+
   const onSearch = () => {
     if (!query.trim()) return;
+
+    // 히스토리에 추가 (중복 제거)
+    const newHistory = [
+      query,
+      ...searchHistory.filter((h) => h !== query),
+    ].slice(0, 10); // 최대 10개
+    setSearchHistory(newHistory);
+    localStorage.setItem("searchHistory", JSON.stringify(newHistory));
+
     navigate(routes.search, { state: { query } });
   };
 
@@ -43,12 +73,38 @@ function MainPage() {
 
   const handleExampleClick = (exampleQuery) => {
     setQuery(exampleQuery);
+
+    // 히스토리에 추가
+    const newHistory = [
+      exampleQuery,
+      ...searchHistory.filter((h) => h !== exampleQuery),
+    ].slice(0, 10);
+    setSearchHistory(newHistory);
+    localStorage.setItem("searchHistory", JSON.stringify(newHistory));
+
     navigate(routes.search, { state: { query: exampleQuery } });
+  };
+
+  const handleHistoryClick = (historyQuery) => {
+    setQuery(historyQuery);
+    navigate(routes.search, { state: { query: historyQuery } });
+  };
+
+  const handleDeleteHistory = (historyQuery, e) => {
+    e.stopPropagation(); // 클릭 이벤트 전파 방지
+    const newHistory = searchHistory.filter((h) => h !== historyQuery);
+    setSearchHistory(newHistory);
+    localStorage.setItem("searchHistory", JSON.stringify(newHistory));
+  };
+
+  const handleClearAllHistory = () => {
+    setSearchHistory([]);
+    localStorage.removeItem("searchHistory");
   };
 
   return (
     <>
-      <div className="min-h-screen w-screen bg-gradient-to-br from-gray-50 via-gray-100 to-gray-200 flex flex-col">
+      <div className="min-h-screen w-screen bg-gradient-to-br from-gray-50 via-gray-100 to-gray-200 flex flex-col relative">
         <header className="p-5 flex items-center gap-3 justify-between">
           <HeaderBar />
           <button
@@ -59,6 +115,78 @@ function MainPage() {
             <span className="font-medium">가이드</span>
           </button>
         </header>
+
+        {/* 히스토리 토글 버튼 */}
+        <button
+          onClick={() => setShowHistory(!showHistory)}
+          className="fixed left-0 top-1/2 -translate-y-1/2 bg-indigo-600 text-indigo-600 p-3 rounded-r-lg shadow-lg hover:bg-indigo-700 transition-all z-40"
+          style={{ left: showHistory ? "320px" : "0" }}
+        >
+          {showHistory ? (
+            <ChevronLeft className="w-6 h-6" />
+          ) : (
+            <ChevronRight className="w-6 h-6" />
+          )}
+        </button>
+
+        {/* 히스토리 사이드바 */}
+        <div
+          className={`fixed left-0 top-0 h-full w-80 bg-white shadow-2xl transition-transform duration-300 z-30 ${
+            showHistory ? "translate-x-0" : "-translate-x-full"
+          }`}
+        >
+          <div className="p-6 border-b border-gray-200">
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center gap-2">
+                <History className="w-6 h-6 text-indigo-600" />
+                <h2 className="text-xl font-bold text-gray-800">
+                  검색 히스토리
+                </h2>
+              </div>
+              {searchHistory.length > 0 && (
+                <button
+                  onClick={handleClearAllHistory}
+                  className="text-xs text-red-600 hover:text-red-800 font-medium"
+                >
+                  전체 삭제
+                </button>
+              )}
+            </div>
+            <p className="text-sm text-gray-500">최근 검색한 내역입니다</p>
+          </div>
+
+          <div className="overflow-y-auto h-[calc(100%-120px)] p-4">
+            {searchHistory.length === 0 ? (
+              <div className="text-center py-12">
+                <History className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+                <p className="text-gray-400 text-sm">검색 기록이 없습니다</p>
+              </div>
+            ) : (
+              <div className="space-y-2">
+                {searchHistory.map((historyItem, index) => (
+                  <div
+                    key={index}
+                    onClick={() => handleHistoryClick(historyItem)}
+                    className="group flex items-start justify-between p-3 bg-gray-50 hover:bg-indigo-50 rounded-lg cursor-pointer transition-all border border-transparent hover:border-indigo-300"
+                  >
+                    <div className="flex items-start gap-3 flex-1 min-w-0 pr-2">
+                      <History className="w-4 h-4 text-gray-600 flex-shrink-0 mt-0.5" />
+                      <span className="text-sm text-gray-700 group-hover:text-indigo-700 break-words whitespace-normal leading-relaxed">
+                        {historyItem}
+                      </span>
+                    </div>
+                    <button
+                      onClick={(e) => handleDeleteHistory(historyItem, e)}
+                      className="opacity-0 group-hover:opacity-100 p-1 hover:bg-red-100 rounded transition-all flex-shrink-0"
+                    >
+                      <X className="w-4 h-4 text-red-600" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
 
         <main className="mx-100 my-50 flex-1 flex flex-col items-center text-center">
           <h1 className="text-5xl md:text-6xl bg-gradient-to-r from-indigo-600 to-slate-600 bg-clip-text text-transparent mb-5 tracking-tight">
@@ -141,7 +269,6 @@ function MainPage() {
                   <h3 className="font-bold text-gray-800 mb-2">💡 검색 팁</h3>
                   <ul className="text-sm text-gray-700 space-y-1">
                     <li>• 나이, 성별, 지역 등 기본 정보와 함께 검색하세요</li>
-
                     <li>• 여러 조건을 자유롭게 조합할 수 있습니다</li>
                   </ul>
                 </div>
