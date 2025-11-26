@@ -43,14 +43,16 @@ export default function SearchingPage() {
       return;
     }
 
-    // SearchingPage.jsx - fetchData 함수 수정
+    // 검색 모델 기본값 설정
+    const searchModel = model || "fast";
+
     async function fetchData() {
       try {
-        console.log("검색 요청:", query + "\n 검색 모델:", model);
+        console.log("검색 요청:", query, "\n검색 모델:", searchModel);
 
         const res = await axios.post("http://localhost:5000/api/search", {
           query, // 입력 쿼리
-          model, // 검색 모델
+          model: searchModel, // 검색 모델 (fast/deep)
         });
 
         console.log("검색 응답:", res.data);
@@ -61,12 +63,13 @@ export default function SearchingPage() {
               // 결과가 없으면 NoResultPage로 이동
               if (!res.data.panels || res.data.panels.length === 0) {
                 navigate(routes.noResult, {
-                  state: { query },
+                  state: { query, model: searchModel },
                 });
               } else {
                 navigate(routes.result, {
                   state: {
                     query,
+                    model: searchModel,
                     result: res.data,
                   },
                 });
@@ -113,7 +116,7 @@ export default function SearchingPage() {
       clearTimeout(stepTimer);
       clearInterval(progressTimer);
     };
-  }, [query, navigate]);
+  }, [query, model, navigate]);
 
   const CurrentIcon = steps[currentStep]?.icon || Loader2;
 

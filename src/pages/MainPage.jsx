@@ -1,6 +1,5 @@
 import HeaderBar from "@common/bar/HeaderBar";
 import { SearchInput } from "@components/SearchInput";
-import SearchModelDropdown from "@components/SearchModelDropdown";
 import { useState, useEffect } from "react";
 import routes from "@utils/constants/routes";
 import { useNavigate } from "react-router-dom";
@@ -130,6 +129,7 @@ function MainPage() {
   const handleModelChange = (model) => {
     setSelectedModel(model);
     setShowTooltip(true);
+    console.log("🔍 선택된 검색 모델:", model);
   };
 
   // 검색 모델 설명
@@ -235,7 +235,7 @@ function MainPage() {
         {/* 히스토리 토글 버튼 */}
         <button
           onClick={() => setShowHistory(!showHistory)}
-          className="fixed left-0 top-1/2 -translate-y-1/2 bg-indigo-600 text-indigo-700 p-3 rounded-r-lg shadow-lg hover:bg-indigo-700 transition-all z-40"
+          className="fixed left-0 top-1/2 -translate-y-1/2 bg-indigo-600 text-indigo-800 p-3 rounded-r-lg shadow-lg hover:bg-indigo-700 transition-all z-40"
           style={{ left: showHistory ? "320px" : "0" }}
         >
           {showHistory ? (
@@ -312,7 +312,6 @@ function MainPage() {
             AI가 당신의 검색을 이해하고 정확한 패널을 찾아드립니다
           </p>
 
-          {/* @@@@@@@@@@@@@@@@@@@@@@@@@@@임시 배치@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ */}
           <SearchInput
             value={query}
             onChange={setQuery}
