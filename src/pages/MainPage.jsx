@@ -1,5 +1,6 @@
 import HeaderBar from "@common/bar/HeaderBar";
 import { SearchInput } from "@components/SearchInput";
+import SearchModelDropdown from "@components/SearchModelDropdown";
 import { useState, useEffect } from "react";
 import routes from "@utils/constants/routes";
 import { useNavigate } from "react-router-dom";
@@ -19,6 +20,9 @@ import GuideModal from "@components/GuideModal";
 function MainPage() {
   const navigate = useNavigate();
   const [query, setQuery] = useState("");
+
+  // 검색 모델 상태 (fast | deep)
+  const [selectedModel, setSelectedModel] = useState("fast");
 
   const [showGuide, setShowGuide] = useState(false);
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -46,7 +50,8 @@ function MainPage() {
     setSearchHistory(newHistory);
     localStorage.setItem("searchHistory", JSON.stringify(newHistory));
 
-    navigate(routes.search, { state: { query } });
+    // 검색 모델과 자연어 쿼리를 검색 로딩 페이지로 전송
+    navigate(routes.search, { state: { query: query, model: selectedModel } });
   };
 
   // 검색 예시 데이터
@@ -82,12 +87,16 @@ function MainPage() {
     setSearchHistory(newHistory);
     localStorage.setItem("searchHistory", JSON.stringify(newHistory));
 
-    navigate(routes.search, { state: { query: exampleQuery } });
+    navigate(routes.search, {
+      state: { query: exampleQuery, model: selectedModel },
+    });
   };
 
   const handleHistoryClick = (historyQuery) => {
     setQuery(historyQuery);
-    navigate(routes.search, { state: { query: historyQuery } });
+    navigate(routes.search, {
+      state: { query: historyQuery, model: selectedModel },
+    });
   };
 
   const handleDeleteHistory = (historyQuery, e) => {
@@ -107,6 +116,7 @@ function MainPage() {
       <div className="min-h-screen w-screen bg-gradient-to-br from-gray-50 via-gray-100 to-gray-200 flex flex-col relative">
         <header className="p-5 flex items-center gap-3 justify-between">
           <HeaderBar />
+
           <button
             onClick={() => setShowGuide(true)}
             className="flex items-center gap-2 px-4 py-2 bg-indigo-100 text-indigo-800 rounded-lg border-2 border-indigo-600 hover:bg-indigo-200 transition-colors"
@@ -196,6 +206,7 @@ function MainPage() {
             AI가 당신의 검색을 이해하고 정확한 패널을 찾아드립니다
           </p>
 
+          {/* @@@@@@@@@@@@@@@@@@@@@@@@@@@임시 배치@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ */}
           <SearchInput
             value={query}
             onChange={setQuery}
@@ -205,6 +216,11 @@ function MainPage() {
 
           {/* 검색 예시 섹션 */}
           <div className="mt-16 w-full max-w-5xl px-4">
+            {/* ✅ 검색 모델 드롭다운 */}
+            <SearchModelDropdown
+              value={selectedModel}
+              onChange={setSelectedModel}
+            />
             <div className="flex items-center justify-center gap-2 mb-6">
               <div className="h-px w-12 bg-gradient-to-r from-transparent to-indigo-300"></div>
               <h2 className="text-lg font-semibold text-gray-700">

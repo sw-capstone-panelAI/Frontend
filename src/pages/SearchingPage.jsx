@@ -19,7 +19,7 @@ function ProgressBar({ value }) {
 export default function SearchingPage() {
   const location = useLocation();
   const navigate = useNavigate();
-  const query = location.state?.query || "";
+  const { query, model } = location.state || {};
 
   const [progress, setProgress] = useState(0);
   const [currentStep, setCurrentStep] = useState(0);
@@ -46,10 +46,11 @@ export default function SearchingPage() {
     // SearchingPage.jsx - fetchData 함수 수정
     async function fetchData() {
       try {
-        console.log("검색 요청:", query);
+        console.log("검색 요청:", query + "\n 검색 모델:", model);
 
         const res = await axios.post("http://localhost:5000/api/search", {
-          query,
+          query, // 입력 쿼리
+          model, // 검색 모델
         });
 
         console.log("검색 응답:", res.data);
