@@ -13,6 +13,8 @@ import {
   ChevronLeft,
   History,
   X,
+  Zap,
+  Brain,
 } from "lucide-react";
 
 import GuideModal from "@components/GuideModal";
@@ -31,6 +33,9 @@ function MainPage() {
   const [showHistory, setShowHistory] = useState(false);
   const [searchHistory, setSearchHistory] = useState([]);
 
+  // 말풍선 툴팁 상태
+  const [showTooltip, setShowTooltip] = useState(false);
+
   // 컴포넌트 마운트 시 로컬스토리지에서 히스토리 불러오기
   useEffect(() => {
     const savedHistory = localStorage.getItem("searchHistory");
@@ -38,6 +43,17 @@ function MainPage() {
       setSearchHistory(JSON.parse(savedHistory));
     }
   }, []);
+
+  // 말풍선 자동 숨김 타이머
+  useEffect(() => {
+    if (showTooltip) {
+      const timer = setTimeout(() => {
+        setShowTooltip(false);
+      }, 5000); // 5초 후 자동 숨김
+
+      return () => clearTimeout(timer);
+    }
+  }, [showTooltip]);
 
   const onSearch = () => {
     if (!query.trim()) return;
@@ -111,11 +127,101 @@ function MainPage() {
     localStorage.removeItem("searchHistory");
   };
 
+  const handleModelChange = (model) => {
+    setSelectedModel(model);
+    setShowTooltip(true);
+  };
+
+  // 검색 모델 설명
+  const modelDescriptions = {
+    fast: {
+      icon: <Zap className="w-4 h-4" />,
+      title: "빠른 검색",
+      description: "신속한 패널 검색으로 즉시 결과를 확인하세요",
+    },
+    deep: {
+      icon: <Brain className="w-4 h-4" />,
+      title: "정밀 검색",
+      description: "AI가 깊이 분석하여 더욱 정확한 패널을 찾아드립니다",
+    },
+  };
+
   return (
     <>
       <div className="min-h-screen w-screen bg-gradient-to-br from-gray-50 via-gray-100 to-gray-200 flex flex-col relative">
         <header className="p-5 flex items-center gap-3 justify-between">
-          <HeaderBar />
+          <div className="flex items-center gap-4">
+            <HeaderBar />
+
+            {/* 검색 모델 선택 버튼 */}
+            <div className="relative">
+              <div className="flex gap-2 bg-white rounded-lg p-1.5 shadow-md border-2 border-gray-200">
+                <button
+                  onClick={() => handleModelChange("fast")}
+                  className={`flex items-center gap-2 px-5 py-2.5 rounded-md transition-all font-semibold ${
+                    selectedModel === "fast"
+                      ? "bg-gradient-to-r from-indigo-500 to-indigo-500 text-white shadow-lg shadow-indigo-300 scale-105 border-2 border-indigo-400"
+                      : "text-gray-600 hover:bg-gray-100 border-2 border-transparent"
+                  }`}
+                >
+                  <Zap
+                    className={`w-5 h-5 ${
+                      selectedModel === "fast" ? "drop-shadow-sm" : ""
+                    }`}
+                  />
+                  <span className="text-sm">빠른 검색</span>
+                </button>
+                <button
+                  onClick={() => handleModelChange("deep")}
+                  className={`flex items-center gap-2 px-5 py-2.5 rounded-md transition-all font-semibold ${
+                    selectedModel === "deep"
+                      ? "bg-gradient-to-r from-indigo-500 to-indigo-500 text-white shadow-lg shadow-indigo-300 scale-105 border-2 border-indigo-400"
+                      : "text-gray-600 hover:bg-gray-100 border-2 border-transparent"
+                  }`}
+                >
+                  <Brain
+                    className={`w-5 h-5 ${
+                      selectedModel === "deep" ? "drop-shadow-sm" : ""
+                    }`}
+                  />
+                  <span className="text-sm">정밀 검색</span>
+                </button>
+              </div>
+
+              {/* 말풍선 툴팁 */}
+              {showTooltip && (
+                <div className="absolute top-full left-1/2 -translate-x-1/2 mt-3 z-50 animate-in fade-in slide-in-from-top-2 duration-300">
+                  <div className="relative bg-white rounded-lg shadow-xl border-2 border-indigo-200 p-4 w-72">
+                    {/* 위쪽 화살표 */}
+                    <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-4 h-4 bg-white border-t-2 border-l-2 border-indigo-200 rotate-45"></div>
+
+                    {/* 닫기 버튼 */}
+                    <button
+                      onClick={() => setShowTooltip(false)}
+                      className="absolute top-2 right-2 p-1 hover:bg-gray-100 rounded transition-colors"
+                    >
+                      <X className="w-4 h-4 text-gray-400" />
+                    </button>
+
+                    {/* 내용 */}
+                    <div className="flex items-start gap-3">
+                      <div className="p-2 bg-indigo-50 rounded-lg flex-shrink-0">
+                        {modelDescriptions[selectedModel].icon}
+                      </div>
+                      <div className="text-left">
+                        <h4 className="font-bold text-gray-800 mb-1">
+                          {modelDescriptions[selectedModel].title}
+                        </h4>
+                        <p className="text-sm text-gray-600 leading-relaxed">
+                          {modelDescriptions[selectedModel].description}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
 
           <button
             onClick={() => setShowGuide(true)}
@@ -129,7 +235,7 @@ function MainPage() {
         {/* 히스토리 토글 버튼 */}
         <button
           onClick={() => setShowHistory(!showHistory)}
-          className="fixed left-0 top-1/2 -translate-y-1/2 bg-indigo-600 text-indigo-600 p-3 rounded-r-lg shadow-lg hover:bg-indigo-700 transition-all z-40"
+          className="fixed left-0 top-1/2 -translate-y-1/2 bg-indigo-600 text-indigo-700 p-3 rounded-r-lg shadow-lg hover:bg-indigo-700 transition-all z-40"
           style={{ left: showHistory ? "320px" : "0" }}
         >
           {showHistory ? (
@@ -216,11 +322,6 @@ function MainPage() {
 
           {/* 검색 예시 섹션 */}
           <div className="mt-16 w-full max-w-5xl px-4">
-            {/* ✅ 검색 모델 드롭다운 */}
-            <SearchModelDropdown
-              value={selectedModel}
-              onChange={setSelectedModel}
-            />
             <div className="flex items-center justify-center gap-2 mb-6">
               <div className="h-px w-12 bg-gradient-to-r from-transparent to-indigo-300"></div>
               <h2 className="text-lg font-semibold text-gray-700">

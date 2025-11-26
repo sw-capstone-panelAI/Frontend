@@ -92,7 +92,7 @@ const guideSlides = [
     ],
   },
   {
-    title: "3-1단계: 검색 결과 - 패널 목록 및 AI 활용 기능",
+    title: "3-1단계: 검색 결과 - 패널 목록",
     description:
       "왼쪽에는 매칭된 패널 목록이, 오른쪽에는 AI 활용 기능과 전체 패널의 평균 정보가 표시됩니다.",
     page: "result-1",
@@ -104,7 +104,7 @@ const guideSlides = [
       },
       {
         position: "right",
-        text: "AI가 추천하는 연관 검색어와 패널의 공통 특성을 자동으로 분석합니다",
+        text: "AI가 추천하는 연관 검색어를 확인할 수 있습니다",
         icon: "🤖",
       },
       {
@@ -120,35 +120,7 @@ const guideSlides = [
     ],
   },
   {
-    title: "3-2단계: 공통 특성 분석",
-    description:
-      "마케팅 전문가를 위한 기능! AI가 검색된 패널들의 공통점을 자동으로 분석합니다.",
-    page: "common",
-    tooltips: [
-      {
-        position: "top",
-        text: "마케팅 타겟 설정에 유용한 인사이트를 제공합니다",
-        icon: "🎯",
-      },
-      {
-        position: "analysis",
-        text: "연령대, 지역, 소비 패턴 등 패널들의 주요 공통점을 파악합니다",
-        icon: "📊",
-      },
-      {
-        position: "marketing",
-        text: "마케팅 캠페인 기획 시 타겟 세그먼트 이해에 활용하세요",
-        icon: "💼",
-      },
-      {
-        position: "insight",
-        text: "AI가 발견한 패턴을 통해 새로운 마케팅 기회를 발견할 수 있습니다",
-        icon: "💡",
-      },
-    ],
-  },
-  {
-    title: "3-3단계: 패널 상세 정보",
+    title: "3-2단계: 패널 상세 정보",
     description: "선택한 패널의 모든 정보를 자세히 확인할 수 있습니다.",
     page: "result-2",
     tooltips: [
@@ -175,7 +147,7 @@ const guideSlides = [
     ],
   },
   {
-    title: "3-4단계: 신뢰도 필터 기능",
+    title: "3-3단계: 신뢰도 필터 기능",
     description:
       "신뢰도 점수로 패널을 필터링하여 원하는 품질의 데이터만 확인할 수 있습니다.",
     page: "result-3",
@@ -198,7 +170,7 @@ const guideSlides = [
     ],
   },
   {
-    title: "3-5단계: 패널 정보 시각화",
+    title: "3-4단계: 패널 정보 시각화",
     description:
       "패널의 주요 정보를 다양한 차트로 시각화하여 한눈에 파악할 수 있습니다.",
     page: "result-4",
@@ -240,6 +212,34 @@ const guideSlides = [
         position: "bottom",
         text: "선택한 키워드로 새로운 검색어를 생성하고\n바로 검색을 시작할 수 있어요",
         icon: "✨",
+      },
+    ],
+  },
+  {
+    title: "5단계: 공통 특성 분석",
+    description:
+      "마케팅 전문가를 위한 기능! AI가 검색된 패널들의 공통점을 자동으로 분석합니다.",
+    page: "common",
+    tooltips: [
+      {
+        position: "top",
+        text: "마케팅 타겟 설정에 유용한 인사이트를 제공합니다",
+        icon: "🎯",
+      },
+      {
+        position: "analysis",
+        text: "연령대, 지역, 소비 패턴 등 패널들의 주요 공통점을 파악합니다",
+        icon: "📊",
+      },
+      {
+        position: "marketing",
+        text: "마케팅 캠페인 기획 시 타겟 세그먼트 이해에 활용하세요",
+        icon: "💼",
+      },
+      {
+        position: "insight",
+        text: "AI가 발견한 패턴을 통해 새로운 마케팅 기회를 발견할 수 있습니다",
+        icon: "💡",
       },
     ],
   },
@@ -341,32 +341,7 @@ function renderPageMockup(pageType) {
           <div className="p-6">
             <img
               src={ResultPage1}
-              alt="패널 목록 및 AI 활용 기능"
-              className="w-full h-auto rounded-xl shadow-2xl border-2 border-indigo-300"
-            />
-          </div>
-        </div>
-      );
-
-    case "common":
-      return (
-        <div className="h-full overflow-y-auto bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50">
-          <div className="p-6">
-            <div className="mb-4 bg-white rounded-lg p-4 shadow-md border-2 border-indigo-300">
-              <div className="flex items-center gap-3 mb-2">
-                <span className="text-2xl">💼</span>
-                <h4 className="text-lg font-bold text-gray-800">
-                  마케팅 전문가를 위한 인사이트
-                </h4>
-              </div>
-              <p className="text-sm text-gray-600">
-                타겟 고객층의 공통점을 파악하여 효과적인 마케팅 전략을
-                수립하세요
-              </p>
-            </div>
-            <img
-              src={Common}
-              alt="공통 특성 분석"
+              alt="패널 목록"
               className="w-full h-auto rounded-xl shadow-2xl border-2 border-indigo-300"
             />
           </div>
@@ -427,6 +402,31 @@ function renderPageMockup(pageType) {
             <img
               src={RelatedSearchPage}
               alt="연관 검색어 마인드맵"
+              className="w-full h-auto rounded-xl shadow-2xl border-2 border-indigo-300"
+            />
+          </div>
+        </div>
+      );
+
+    case "common":
+      return (
+        <div className="h-full overflow-y-auto bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50">
+          <div className="p-6">
+            <div className="mb-4 bg-white rounded-lg p-4 shadow-md border-2 border-indigo-300">
+              <div className="flex items-center gap-3 mb-2">
+                <span className="text-2xl">💼</span>
+                <h4 className="text-lg font-bold text-gray-800">
+                  마케팅 전문가를 위한 인사이트
+                </h4>
+              </div>
+              <p className="text-sm text-gray-600">
+                타겟 고객층의 공통점을 파악하여 효과적인 마케팅 전략을
+                수립하세요
+              </p>
+            </div>
+            <img
+              src={Common}
+              alt="공통 특성 분석"
               className="w-full h-auto rounded-xl shadow-2xl border-2 border-indigo-300"
             />
           </div>
@@ -567,7 +567,7 @@ export default function GuideModal({ show, onClose, current, setCurrent }) {
             ) : (
               <button
                 onClick={onClose}
-                className="flex items-center gap-2 px-6 py-2 bg-indigo-600 text-indigo-600 rounded-lg hover:bg-indigo-700 font-bold transition-colors shadow-lg"
+                className="flex items-center gap-2 px-6 py-2 bg-indigo-600 text-indigo-800 rounded-lg hover:bg-indigo-700 font-bold transition-colors shadow-lg"
               >
                 시작하기 🚀
               </button>
