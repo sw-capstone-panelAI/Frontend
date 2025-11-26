@@ -5,9 +5,6 @@ import { useLocation, useNavigate } from "react-router-dom";
 import routes from "@utils/constants/routes";
 import axios from "axios";
 
-/**
- * 마인드맵 노드 위치 및 중앙 위치 (6개로 조정)
- */
 const positions = [
   { x: 30, y: 20 },
   { x: 70, y: 20 },
@@ -18,9 +15,6 @@ const positions = [
 ];
 const CENTER_POS = { x: 50, y: 50 };
 
-/**
- * MindMapNode 컴포넌트
- */
 function MindMapNode({
   label,
   onClick,
@@ -55,9 +49,6 @@ function MindMapNode({
   );
 }
 
-/**
- * 말풍선 알림 컴포넌트 (마인드맵 중앙)
- */
 function ToastNotification({ show, message }) {
   if (!show) return null;
 
@@ -74,7 +65,6 @@ function ToastNotification({ show, message }) {
           <AlertCircle className="w-6 h-6 flex-shrink-0" />
           <p className="text-sm font-bold whitespace-pre-line">{message}</p>
         </div>
-        {/* 말풍선 꼬리 */}
         <div className="absolute left-1/2 bottom-0 transform -translate-x-1/2 translate-y-full">
           <div className="w-0 h-0 border-l-[10px] border-l-transparent border-r-[10px] border-r-transparent border-t-[10px] border-t-amber-600"></div>
           <div className="w-0 h-0 border-l-[8px] border-l-transparent border-r-[8px] border-r-transparent border-t-[8px] border-t-amber-500 absolute left-1/2 transform -translate-x-1/2 -top-[9px]"></div>
@@ -84,9 +74,6 @@ function ToastNotification({ show, message }) {
   );
 }
 
-/**
- * Custom Modal Component
- */
 const SimpleModal = ({ message, onClose }) => {
   if (!message) return null;
 
@@ -137,9 +124,11 @@ export default function App() {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const { query: originalQuery } = location.state || {};
+  const { query: originalQuery, model: searchModel } = location.state || {};
 
-  // 백엔드에서 추천어 생성요청
+  // 검색 모델 기본값 설정
+  const currentModel = searchModel || "fast";
+
   async function fetchKeyword(originalQuery) {
     try {
       console.log("키워드 생성 요청: ", { originalQuery });
@@ -161,7 +150,6 @@ export default function App() {
     }
   }
 
-  // 백엔드에서 추천어 기반으로 문장 생성 요청
   async function fetchNewQuery(originalQuery, selectedQueries) {
     try {
       console.log("추천어기반 쿼리생성 요청: ", { selectedQueries });
@@ -184,18 +172,15 @@ export default function App() {
     }
   }
 
-  // 마운트시 1번만 실행
   useEffect(() => {
-    // 백엔드에 키워드 생성 요청
     fetchKeyword(originalQuery);
   }, []);
 
-  // Toast 자동 숨김 효과
   useEffect(() => {
     if (showToast) {
       const timer = setTimeout(() => {
         setShowToast(false);
-      }, 2500); // 2.5초 후 사라짐
+      }, 2500);
 
       return () => clearTimeout(timer);
     }
@@ -208,18 +193,15 @@ export default function App() {
 
   const toggleQuery = (q) => {
     setSelectedQueries((prev) => {
-      // 이미 선택된 경우 제거
       if (prev.includes(q)) {
         return prev.filter((x) => x !== q);
       }
 
-      // 최대 4개까지만 선택 가능
       if (prev.length >= 4) {
         showToastNotification("최대 4개까지만\n선택할 수 있습니다!");
         return prev;
       }
 
-      // 새로 추가
       return [...prev, q];
     });
   };
@@ -231,17 +213,20 @@ export default function App() {
 
   const handleSearch = () => {
     if (recommendedQuery) {
-      // 히스토리에 추가 (중복 제거)
       const savedHistory = localStorage.getItem("searchHistory");
       const searchHistory = savedHistory ? JSON.parse(savedHistory) : [];
       const newHistory = [
         recommendedQuery,
         ...searchHistory.filter((h) => h !== recommendedQuery),
-      ].slice(0, 10); // 최대 10개
+      ].slice(0, 10);
       localStorage.setItem("searchHistory", JSON.stringify(newHistory));
 
-      // 모달 없이 바로 라우팅
-      navigate(routes.search, { state: { query: recommendedQuery } });
+      navigate(routes.search, {
+        state: {
+          query: recommendedQuery,
+          model: currentModel, // 검색 모델 유지
+        },
+      });
     }
   };
 
@@ -251,7 +236,6 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-100 via-gray-50 to-gray-100 flex flex-col font-sans">
-      {/* Header */}
       <header className="sticky top-0 z-30 p-3 pb-5 flex items-center gap-373 justify-between bg-indigo-100 border-b-3 border-indigo-300 rounded-b-2xl shadow-sm">
         <HeaderBar />
         <button
@@ -265,10 +249,8 @@ export default function App() {
       </header>
 
       <main className="px-120 pt-7 pb-20">
-        {/* Custom Modal */}
         <SimpleModal message={message} onClose={() => setMessage(null)} />
 
-        {/* 원본 검색어 */}
         <section className="mb-6">
           <h3 className="mb-1 text-indigo-700 text-sm font-semibold">
             원본 검색어
@@ -278,12 +260,10 @@ export default function App() {
           </p>
         </section>
 
-        {/* 마인드맵 영역 */}
         <section
           className="flex-1 relative bg-white rounded-xl shadow-md p-8 mb-6 border-2 border-indigo-200"
           style={{ minHeight: 500 }}
         >
-          {/* Toast 알림 */}
           <ToastNotification show={showToast} message={toastMessage} />
 
           {loading && relatedQueries.length === 0 ? (
@@ -344,7 +324,6 @@ export default function App() {
           )}
         </section>
 
-        {/* 선택한 키워드 목록 */}
         {selectedQueries.length > 0 && (
           <section className="mb-6">
             <p className="text-sm text-indigo-700 mb-2 font-semibold">
@@ -364,7 +343,6 @@ export default function App() {
           </section>
         )}
 
-        {/* 추천 검색어 생성 및 실행 섹션 */}
         <section className="bg-white border-2 border-indigo-200 rounded-xl p-6 shadow-md">
           <div className="flex items-center gap-2 mb-4">
             <Sparkles className="w-5 h-5 text-indigo-600" />
