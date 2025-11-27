@@ -8,49 +8,88 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
-import incomePng from "@assets/income.png";
 
 function IncomeDistributionChart({ panels }) {
-  // ✅ 1. 구간 정의
   const incomeRanges = [
-    { label: "0~1999", min: 0, max: 1999 },
-    { label: "2000~2999", min: 2000, max: 2999 },
-    { label: "3000~3999", min: 3000, max: 3999 },
-    { label: "4000~4999", min: 4000, max: 4999 },
-    { label: "5000~5999", min: 5000, max: 5999 },
-    { label: "6000~6999", min: 6000, max: 6999 },
-    { label: "7000+", min: 7000, max: Infinity },
+    { label: "100만원 미만", min: 0, max: 99 },
+    { label: "100~199만원", min: 100, max: 199 },
+    { label: "200~299만원", min: 200, max: 299 },
+    { label: "300~399만원", min: 300, max: 399 },
+    { label: "400~499만원", min: 400, max: 499 },
+    { label: "500~599만원", min: 500, max: 599 },
+    { label: "600~699만원", min: 600, max: 699 },
+    { label: "700~799만원", min: 700, max: 799 },
+    { label: "800~899만원", min: 800, max: 899 },
+    { label: "900~999만원", min: 900, max: 999 },
+    { label: "1000만원 이상", min: 1000, max: Infinity },
   ];
 
-  // 널 값 처리 안했음 ----- 널 값 있으면 아마 오류 듯?
-  // ✅ 2. 각 구간별 인원 수 집계
+  const parseIncome = (incomeStr) => {
+    if (!incomeStr || incomeStr === "무응답" || incomeStr === "-") return null;
+    if (incomeStr.includes("미만")) return 50;
+    const match = incomeStr.match(/(\d+)~(\d+)/);
+    if (match) {
+      const min = parseInt(match[1]);
+      const max = parseInt(match[2]);
+      return (min + max) / 2;
+    }
+    if (incomeStr.includes("이상")) return 1000;
+    return null;
+  };
+
   const distribution = incomeRanges.map((range) => {
-    const count = panels.filter(
-      (p) => p.income >= range.min && p.income <= range.max
-    ).length;
+    const count = panels.filter((p) => {
+      const income = parseIncome(p.personalIncome);
+      return income !== null && income >= range.min && income <= range.max;
+    }).length;
     return { name: range.label, value: count };
   });
 
-  // ✅ 3. 차트 렌더링
   return (
-    <div className="flex bg-white border border-gray-300 rounded-lg p-6">
-      <h3 className="pt-15 mb-4 flex flex-col items-center text-center space-y-2">
-        <img src={incomePng} height="150px" width="200px" alt="연령대 분포" />
-        <span>[소득 분포]</span>
-      </h3>
+    <div className="flex flex-col bg-white border border-slate-300 rounded-lg p-6 shadow-sm">
+      <div className="mb-6">
+        <h3 className="text-3xl font-bold text-indigo-900">소득 분포</h3>
+      </div>
 
-      <ResponsiveContainer width="100%" height={300}>
-        <BarChart data={distribution}>
-          <CartesianGrid strokeDasharray="3 3" opacity={0.1} />
-          <XAxis dataKey="name" />
-          <YAxis allowDecimals={false} />
-          <Tooltip
-            formatter={(value) => [`${value}명`, "인원수"]}
-            labelFormatter={(label) => `소득 구간: ${label}만원`}
-          />
-          <Bar dataKey="value" fill="#14be56ff" radius={[6, 6, 0, 0]} />
-        </BarChart>
-      </ResponsiveContainer>
+      <div className="flex justify-center">
+        <ResponsiveContainer width="100%" height={350}>
+          <BarChart
+            data={distribution}
+            margin={{ top: 20, right: 30, left: 20, bottom: 60 }}
+          >
+            <CartesianGrid strokeDasharray="3 3" stroke="#e0e7ff" />
+            <XAxis
+              dataKey="name"
+              tick={{ fill: "#4338ca", fontSize: 11 }}
+              axisLine={{ stroke: "#a5b4fc" }}
+              angle={-45}
+              textAnchor="end"
+              height={80}
+            />
+            <YAxis
+              allowDecimals={false}
+              tick={{ fill: "#4338ca" }}
+              axisLine={{ stroke: "#a5b4fc" }}
+              label={{
+                value: "인원 (명)",
+                angle: -90,
+                position: "insideLeft",
+                fill: "#4338ca",
+              }}
+            />
+            <Tooltip
+              formatter={(value) => [`${value}명`, "인원수"]}
+              labelFormatter={(label) => `소득 구간: ${label}`}
+              contentStyle={{
+                backgroundColor: "white",
+                border: "1px solid #cbd5e1",
+                borderRadius: "8px",
+              }}
+            />
+            <Bar dataKey="value" fill="#6366f1" radius={[8, 8, 0, 0]} />
+          </BarChart>
+        </ResponsiveContainer>
+      </div>
     </div>
   );
 }

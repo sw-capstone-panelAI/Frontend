@@ -1,30 +1,22 @@
 import { useState, useEffect } from "react";
-import { Loader2, Sparkles, ArrowLeft, X } from "lucide-react"; // X 아이콘 추가
+import { Loader2, Sparkles, ArrowLeft, X, AlertCircle } from "lucide-react";
 import HeaderBar from "@common/bar/HeaderBar";
 import { useLocation, useNavigate } from "react-router-dom";
 import routes from "@utils/constants/routes";
+import axios from "axios";
 
-/**
- * 마인드맵 노드 위치 및 중앙 위치
- */
 const positions = [
   { x: 30, y: 20 },
   { x: 70, y: 20 },
-  { x: 15, y: 45 },
-  { x: 50, y: 30 },
-  { x: 85, y: 45 },
-  { x: 30, y: 70 },
-  { x: 70, y: 70 },
-  { x: 50, y: 85 },
+  { x: 15, y: 50 },
+  { x: 85, y: 50 },
+  { x: 30, y: 80 },
+  { x: 70, y: 80 },
 ];
 const CENTER_POS = { x: 50, y: 50 };
 
-/**
- * MindMapNode 컴포넌트
- */
 function MindMapNode({
   label,
-  percentage,
   onClick,
   position,
   isCenter = false,
@@ -52,17 +44,36 @@ function MindMapNode({
     >
       <div className="flex items-center gap-2 whitespace-nowrap">
         <span className="text-sm font-medium">{label}</span>
-        {!isCenter && percentage !== undefined && (
-          <span className="text-xs opacity-70">{percentage}%</span>
-        )}
       </div>
     </div>
   );
 }
 
-/**
- * Custom Modal Component
- */
+function ToastNotification({ show, message }) {
+  if (!show) return null;
+
+  return (
+    <div
+      className="absolute z-40 transform -translate-x-1/2 -translate-y-1/2 animate-in fade-in zoom-in-95 duration-300"
+      style={{
+        left: "50%",
+        top: "50%",
+      }}
+    >
+      <div className="relative bg-gradient-to-r from-amber-500 to-orange-500 text-white px-6 py-4 rounded-2xl shadow-2xl border-2 border-amber-600 max-w-xs">
+        <div className="flex items-center gap-3">
+          <AlertCircle className="w-6 h-6 flex-shrink-0" />
+          <p className="text-sm font-bold whitespace-pre-line">{message}</p>
+        </div>
+        <div className="absolute left-1/2 bottom-0 transform -translate-x-1/2 translate-y-full">
+          <div className="w-0 h-0 border-l-[10px] border-l-transparent border-r-[10px] border-r-transparent border-t-[10px] border-t-amber-600"></div>
+          <div className="w-0 h-0 border-l-[8px] border-l-transparent border-r-[8px] border-r-transparent border-t-[8px] border-t-amber-500 absolute left-1/2 transform -translate-x-1/2 -top-[9px]"></div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 const SimpleModal = ({ message, onClose }) => {
   if (!message) return null;
 
@@ -92,7 +103,7 @@ const SimpleModal = ({ message, onClose }) => {
         </div>
         <button
           onClick={handleConfirmClick}
-          className="w-full bg-indigo-100 text-indigo-800 py-2 px-4 rounded-lg font-bold text-lg border-2 border-indigo-600"
+          className="w-full bg-indigo-100 text-indigo-800 py-2 px-4 rounded-lg font-bold text-lg border-2 border-indigo-600 hover:bg-indigo-200 transition-colors"
         >
           확인
         </button>
@@ -107,89 +118,129 @@ export default function App() {
   const [selectedQueries, setSelectedQueries] = useState([]);
   const [recommendedQuery, setRecommendedQuery] = useState("");
   const [message, setMessage] = useState(null);
+  const [showToast, setShowToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState("");
 
-  const location = useLocation(); // 이건 이전페이지에서 데이터 받아올때 사용
+  const location = useLocation();
   const navigate = useNavigate();
 
-  // 이전 페이지에서 원본 쿼리 받아옴 구조분해 할당으로 query를 받아와 originalQuery변수에 저장
-  const { query: originalQuery } = location.state || {};
+  const { query: originalQuery, model: searchModel } = location.state || {};
+
+  // 검색 모델 기본값 설정
+  const currentModel = searchModel || "fast";
+
+  async function fetchKeyword(originalQuery) {
+    try {
+      console.log("키워드 생성 요청: ", { originalQuery });
+
+      const res = await axios.post(
+        "http://localhost:5000/api/related-keywords",
+        {
+          query: originalQuery,
+        }
+      );
+
+      console.log("생성된 추천어:", res.data);
+      setRelatedQueries(res.data);
+      setLoading(false);
+    } catch (err) {
+      console.error("요청 실패:", err);
+      alert("키워드 생성 중 오류가 발생했습니다. 다시 시도해주세요.");
+      navigate(-1);
+    }
+  }
+
+  async function fetchNewQuery(originalQuery, selectedQueries) {
+    try {
+      console.log("추천어기반 쿼리생성 요청: ", { selectedQueries });
+
+      const res = await axios.post(
+        "http://localhost:5000/api/keywords-newQuery",
+        {
+          query: originalQuery,
+          keywords: selectedQueries,
+        }
+      );
+
+      console.log("생성된 추천어:", res.data);
+      setRecommendedQuery(res.data.query);
+      setLoading(false);
+    } catch (err) {
+      console.error("요청 실패:", err);
+      alert("키워드 생성 중 오류가 발생했습니다. 다시 시도해주세요.");
+      navigate(-1);
+    }
+  }
 
   useEffect(() => {
-    setTimeout(() => {
-      setRelatedQueries([
-        { text: "20대 여성", similarity: 0.92 },
-        { text: "서울 거주", similarity: 0.88 },
-        { text: "직장인", similarity: 0.85 },
-        { text: "월소득 300만원", similarity: 0.82 },
-        { text: "미혼", similarity: 0.78 },
-        { text: "대졸", similarity: 0.75 },
-        { text: "IT업계", similarity: 0.72 },
-      ]);
-      setLoading(false);
-    }, 1500);
+    fetchKeyword(originalQuery);
   }, []);
 
+  useEffect(() => {
+    if (showToast) {
+      const timer = setTimeout(() => {
+        setShowToast(false);
+      }, 2500);
+
+      return () => clearTimeout(timer);
+    }
+  }, [showToast]);
+
+  const showToastNotification = (msg) => {
+    setToastMessage(msg);
+    setShowToast(true);
+  };
+
   const toggleQuery = (q) => {
-    setSelectedQueries((prev) =>
-      prev.includes(q) ? prev.filter((x) => x !== q) : [...prev, q]
-    );
+    setSelectedQueries((prev) => {
+      if (prev.includes(q)) {
+        return prev.filter((x) => x !== q);
+      }
+
+      if (prev.length >= 4) {
+        showToastNotification("최대 4개까지만\n선택할 수 있습니다!");
+        return prev;
+      }
+
+      return [...prev, q];
+    });
   };
 
   const generateQuery = () => {
-    setRecommendedQuery("");
     setLoading(true);
-
-    setTimeout(() => {
-      let newQuery;
-      if (selectedQueries.length > 0) {
-        newQuery = selectedQueries.join(" ") + " 패널";
-      } else {
-        const top3 = relatedQueries.slice(0, 3).map((q) => q.text);
-        newQuery = top3.join(" ") + " 패널";
-      }
-      setRecommendedQuery(newQuery);
-      setLoading(false);
-    }, 800);
+    fetchNewQuery(originalQuery, selectedQueries);
   };
 
-  // 변경된 handleSearch: 확인 클릭하면 검색 페이지로 이동
   const handleSearch = () => {
     if (recommendedQuery) {
-      setMessage({
-        title: "검색 실행 요청",
-        body: `'${recommendedQuery}' 검색이 실행되었습니다.\n검색 페이지로 이동합니다.`,
-        onConfirm: () => {
-          setMessage(null);
-          setRecommendedQuery("");
-          setSelectedQueries([]);
-          navigate(routes.search, { state: { query: `${recommendedQuery}` } });
+      const savedHistory = localStorage.getItem("searchHistory");
+      const searchHistory = savedHistory ? JSON.parse(savedHistory) : [];
+      const newHistory = [
+        recommendedQuery,
+        ...searchHistory.filter((h) => h !== recommendedQuery),
+      ].slice(0, 10);
+      localStorage.setItem("searchHistory", JSON.stringify(newHistory));
+
+      navigate(routes.search, {
+        state: {
+          query: recommendedQuery,
+          model: currentModel, // 검색 모델 유지
         },
       });
     }
   };
 
-  // 새로 추가되는 뒤로가기 버튼 클릭 핸들러 : 결과 페이지로 이동
   const handleBackClick = () => {
-    navigate(-1); // -1만 넣으면 뒤로가기 알아서 처리해준대요 개꿀
+    navigate(-1);
   };
 
   return (
-    <div
-      className="
-      min-h-screen bg-gradient-to-br from-teal-100 to-yellow-50 
-      flex flex-col font-sans"
-    >
-      {/* Header: 로고 오른쪽에 뒤로가기 버튼 */}
-      <header
-        className="
-        sticky top-0 z-30 p-3 pb-5 
-        flex items-center gap-373 justify-between 
-        bg-indigo-100 border-b-3 border-violet-500 rounded-b-2xl"
-      >
+    <div className="min-h-screen bg-gradient-to-br from-gray-100 via-gray-50 to-gray-100 flex flex-col font-sans">
+      <header className="sticky top-0 z-30 p-3 pb-5 flex items-center gap-373 justify-between bg-indigo-100 border-b-3 border-indigo-300 rounded-b-2xl shadow-sm">
         <HeaderBar />
         <button
           onClick={handleBackClick}
-          className="p-2 rounded-lg hover:bg-gray-200 transition-colors flex items-center gap-1 text-gray-700"
+          className="p-2 rounded-lg hover:bg-indigo-200 transition-colors flex items-center gap-1 text-indigo-800 font-medium"
           aria-label="뒤로가기"
         >
           <ArrowLeft className="w-5 h-5" />
@@ -198,26 +249,29 @@ export default function App() {
       </header>
 
       <main className="px-120 pt-7 pb-20">
-        {/* Custom Modal */}
         <SimpleModal message={message} onClose={() => setMessage(null)} />
 
-        {/* 원본 검색어 */}
         <section className="mb-6">
-          <h3 className="mb-1 text-gray-600 text-sm">원본 검색어</h3>
-          <p className="bg-white p-3 rounded-lg shadow-sm border border-gray-200 font-medium text-indigo-700">
+          <h3 className="mb-1 text-indigo-700 text-sm font-semibold">
+            원본 검색어
+          </h3>
+          <p className="bg-white p-3 rounded-lg shadow-sm border-2 border-indigo-200 font-medium text-indigo-700">
             {originalQuery}
           </p>
         </section>
 
-        {/* 마인드맵 영역 */}
         <section
-          className="flex-1 relative bg-white rounded-xl shadow-2xl p-8 mb-6 border border-gray-100"
+          className="flex-1 relative bg-white rounded-xl shadow-md p-8 mb-6 border-2 border-indigo-200"
           style={{ minHeight: 500 }}
         >
+          <ToastNotification show={showToast} message={toastMessage} />
+
           {loading && relatedQueries.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full absolute inset-0 bg-white/80 backdrop-blur-sm">
               <Loader2 className="w-12 h-12 animate-spin text-indigo-600" />
-              <p className="mt-3 text-gray-600">관련 키워드 분석 중...</p>
+              <p className="mt-3 text-indigo-700 font-medium">
+                관련 키워드 분석 중...
+              </p>
             </div>
           ) : relatedQueries.length === 0 ? (
             <div className="flex items-center justify-center h-full">
@@ -243,7 +297,7 @@ export default function App() {
                       y1={CENTER_POS.y}
                       x2={pos.x}
                       y2={pos.y}
-                      stroke={isSelected ? "#4f46e5" : "#a5b4fc"}
+                      stroke={isSelected ? "#4f46e5" : "#c7d2fe"}
                       strokeWidth={isSelected ? 2.5 : 1}
                       strokeDasharray={isSelected ? "0" : "5 5"}
                       className="transition-all duration-300"
@@ -261,7 +315,6 @@ export default function App() {
                 <MindMapNode
                   key={item.text}
                   label={item.text}
-                  percentage={Math.round((item.similarity || 0) * 100)}
                   position={positions[idx] || CENTER_POS}
                   onClick={() => toggleQuery(item.text)}
                   isSelected={selectedQueries.includes(item.text)}
@@ -271,15 +324,16 @@ export default function App() {
           )}
         </section>
 
-        {/* 선택한 키워드 목록 */}
         {selectedQueries.length > 0 && (
           <section className="mb-6">
-            <p className="text-sm text-gray-600 mb-2">선택한 키워드:</p>
+            <p className="text-sm text-indigo-700 mb-2 font-semibold">
+              선택한 키워드 ({selectedQueries.length}/4):
+            </p>
             <div className="flex flex-wrap gap-2">
               {selectedQueries.map((q) => (
                 <div
                   key={q}
-                  className="px-3 py-1 bg-indigo-100 text-indigo-700 rounded-full cursor-pointer border-2 border-indigo-600 transition-colors text-sm font-medium"
+                  className="px-3 py-1 bg-indigo-100 text-indigo-700 rounded-full cursor-pointer border-2 border-indigo-600 hover:bg-indigo-200 transition-colors text-sm font-medium"
                   onClick={() => toggleQuery(q)}
                 >
                   {q} <span className="text-indigo-500">✕</span>
@@ -289,11 +343,10 @@ export default function App() {
           </section>
         )}
 
-        {/* 추천 검색어 생성 및 실행 섹션 */}
-        <section className="bg-white border border-indigo-200 rounded-xl p-6 shadow-lg">
+        <section className="bg-white border-2 border-indigo-200 rounded-xl p-6 shadow-md">
           <div className="flex items-center gap-2 mb-4">
             <Sparkles className="w-5 h-5 text-indigo-600" />
-            <h3 className="font-semibold text-gray-800">추천 검색어 생성</h3>
+            <h3 className="font-semibold text-indigo-800">추천 검색어 생성</h3>
           </div>
 
           {loading &&
@@ -307,7 +360,7 @@ export default function App() {
             </div>
           ) : recommendedQuery ? (
             <>
-              <div className="bg-indigo-50/70 rounded-lg p-4 border border-indigo-100 mb-4 shadow-inner">
+              <div className="bg-indigo-50/70 rounded-lg p-4 border-2 border-indigo-200 mb-4 shadow-sm">
                 <p className="text-sm text-indigo-600 mb-1 font-medium">
                   생성된 검색어
                 </p>
@@ -318,13 +371,13 @@ export default function App() {
               <div className="flex gap-3">
                 <button
                   onClick={handleSearch}
-                  className="flex-1 bg-indigo-100 text-indigo-800 py-2 px-4 rounded-lg font-bold border-2 border-indigo-600 hover:bg-indigo-200"
+                  className="flex-1 bg-indigo-100 text-indigo-800 py-2 px-4 rounded-lg font-bold border-2 border-indigo-600 hover:bg-indigo-200 transition-colors shadow-sm"
                 >
                   이 검색어로 검색하기
                 </button>
                 <button
                   onClick={() => setRecommendedQuery("")}
-                  className="bg-indigo-100 text-indigo-800 py-2 px-4 rounded-lg font-bold border-2 border-indigo-600 hover:bg-indigo-200"
+                  className="bg-indigo-100 text-indigo-800 py-2 px-4 rounded-lg font-bold border-2 border-indigo-600 hover:bg-indigo-200 transition-colors"
                 >
                   다시 생성
                 </button>
@@ -340,7 +393,7 @@ export default function App() {
               <button
                 onClick={generateQuery}
                 disabled={loading}
-                className="w-full bg-indigo-100 text-indigo-800 py-2 px-4 rounded-lg font-bold flex items-center justify-center gap-2 border-2 border-indigo-600 hover:bg-indigo-200 disabled:opacity-50"
+                className="w-full bg-indigo-100 text-indigo-800 py-2 px-4 rounded-lg font-bold flex items-center justify-center gap-2 border-2 border-indigo-600 hover:bg-indigo-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-sm"
               >
                 <Sparkles className="w-4 h-4" />
                 {selectedQueries.length > 0

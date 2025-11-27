@@ -1,460 +1,935 @@
-import { React, useState } from "react";
+import React, { useState } from "react";
 import {
-  MapPin,
-  Briefcase,
-  Users,
   User,
-  DollarSign,
-  Car,
+  Award,
   AlertTriangle,
+  Search,
   ChevronDown,
-  ListFilterPlus,
-  Star,
-  Smile,
+  ChevronUp,
 } from "lucide-react";
 
-export function PanelCard({ panel, onClick, selected }) {
+// 왼쪽 패널 카드 컴포넌트 (임의 번호명 표시)
+export function PanelCard({ panel, displayId, selected, onClick }) {
+  const reliabilityColor =
+    panel.reliability >= 75
+      ? "text-green-600"
+      : panel.reliability >= 50
+      ? "text-yellow-600"
+      : "text-red-600";
+
   return (
     <div
-      className={`p-4 my-1 rounded-lg cursor-pointer border ${
-        selected
-          ? "border-indigo-500 bg-indigo-50"
-          : "border-gray-300 bg-gray-50 hover:border-yellow-600 hover:shadow-lg  hover:border-2"
-      }`}
       onClick={onClick}
+      className={`p-4 mb-2 rounded-lg border-2 cursor-pointer transition-all ${
+        selected
+          ? "bg-indigo-50 border-indigo-500 shadow-lg"
+          : "bg-white border-gray-200 hover:border-indigo-300 hover:shadow-md"
+      }`}
     >
-      <h3 className="font-semibold text-lg">{panel.id}</h3>
-      <p className="text-sm text-gray-600">
-        {panel.age}세 · {panel.gender}
-      </p>
-      <p className="text-sm">
-        {panel.occupation} · {panel.residence}
-      </p>
-      <p className="text-sm text-gray-600 mt-1">
-        신뢰도:
-        <span
-          className={`ml-1 font-semibold ${
-            panel.reliability >= 75
-              ? "text-green-600"
-              : panel.reliability >= 50
-              ? "text-yellow-600"
-              : panel.reliability >= 25
-              ? "text-orange-600"
-              : "text-red-600"
-          }`}
-        >
-          {panel.reliability}%
-        </span>
-      </p>
+      <div className="flex items-center justify-between mb-2">
+        <div className="flex items-center gap-2">
+          <User className="w-5 h-5 text-indigo-600" />
+          <h3 className="font-bold text-indigo-900">{displayId}</h3>
+        </div>
+        <div className="flex items-center gap-1">
+          <Award className={`w-4 h-4 ${reliabilityColor}`} />
+          <span className={`text-sm font-semibold ${reliabilityColor}`}>
+            {panel.reliability}%
+          </span>
+        </div>
+      </div>
+
+      <div className="text-sm text-gray-600 space-y-1">
+        <p>
+          <span className="font-medium">성별:</span> {panel.gender}
+        </p>
+        <p>
+          <span className="font-medium">나이:</span> {panel.age}세
+        </p>
+        <p>
+          <span className="font-medium">거주지:</span> {panel.residence}
+        </p>
+      </div>
+
+      {panel.reliabilityReasons && panel.reliabilityReasons.length > 0 && (
+        <div className="mt-2 p-2 bg-red-50 rounded border border-red-200">
+          <div className="flex items-center gap-1 text-xs text-red-700">
+            <AlertTriangle className="w-3 h-3" />
+            <span className="font-semibold">감점 사유</span>
+          </div>
+          <p className="text-xs text-red-600 mt-1">
+            {panel.reliabilityReasons.slice(0, 2).join(", ")}
+            {panel.reliabilityReasons.length > 2 && "..."}
+          </p>
+        </div>
+      )}
     </div>
   );
 }
 
-export function PanelDetailView({ selectedPanel }) {
-  const [openCharac, setOpenCharac] = useState(false);
-  const [openSubtract, setOpenSubtract] = useState(false);
-  const [openAddInfo, setOpenAddInfo] = useState(false);
+// 접기/펼치기 섹션 컴포넌트
+function CollapsibleSection({ title, icon, children, defaultOpen = true }) {
+  const [isOpen, setIsOpen] = useState(defaultOpen);
+
+  return (
+    <div className="border-t border-gray-200">
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="w-full p-4 flex items-center justify-between hover:bg-gray-50 transition-colors"
+      >
+        <h4 className="font-bold text-indigo-800 flex items-center gap-2">
+          {icon} {title}
+        </h4>
+        {isOpen ? (
+          <ChevronUp className="w-5 h-5 text-indigo-600" />
+        ) : (
+          <ChevronDown className="w-5 h-5 text-indigo-600" />
+        )}
+      </button>
+      {isOpen && <div className="px-4 pb-4 space-y-1">{children}</div>}
+    </div>
+  );
+}
+
+// 오른쪽 패널 상세 정보 컴포넌트 (실제 패널 ID 표시)
+export function PanelDetailView({ selectedPanel, searchQuery = "" }) {
+  const [isExpanded, setIsExpanded] = useState(true); // 전체 열기/닫기 상태
 
   if (!selectedPanel) {
     return (
-      <div className="h-full flex items-center font-bold justify-center text-gray-500">
-        👆원하는 패널을 클릭하여 상세 정보를 확인하세요👆
+      <div className="p-8 text-center text-gray-500 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300">
+        <User className="w-16 h-16 mx-auto mb-4 text-gray-400" />
+        <p className="text-lg font-medium">패널을 선택해주세요</p>
+        <p className="text-sm mt-2">
+          왼쪽 목록에서 패널을 클릭하면 상세 정보가 표시됩니다
+        </p>
       </div>
     );
   }
 
+  // ============================================================
+  // 고급 키워드 매칭 시스템
+  // ============================================================
+
+  const queryLower = searchQuery.toLowerCase();
+
+  // 1. 카테고리별 키워드 정의
+  const categoryKeywords = {
+    // 나이 관련 (X대 형식)
+    age: {
+      patterns: [
+        /10대/,
+        /20대/,
+        /30대/,
+        /40대/,
+        /50대/,
+        /60대/,
+        /70대/,
+        /십대/,
+        /이십대/,
+        /삼십대/,
+        /사십대/,
+        /오십대/,
+        /육십대/,
+        /칠십대/,
+      ],
+      check: (value) => {
+        const ageValue = parseInt(value);
+        if (isNaN(ageValue)) return false;
+
+        for (const pattern of categoryKeywords.age.patterns) {
+          const match = queryLower.match(pattern);
+          if (match) {
+            const decade =
+              match[0].includes("10") || match[0].includes("십")
+                ? 10
+                : match[0].includes("20") || match[0].includes("이십")
+                ? 20
+                : match[0].includes("30") || match[0].includes("삼십")
+                ? 30
+                : match[0].includes("40") || match[0].includes("사십")
+                ? 40
+                : match[0].includes("50") || match[0].includes("오십")
+                ? 50
+                : match[0].includes("60") || match[0].includes("육십")
+                ? 60
+                : match[0].includes("70") || match[0].includes("칠십")
+                ? 70
+                : null;
+
+            if (
+              decade !== null &&
+              ageValue >= decade &&
+              ageValue < decade + 10
+            ) {
+              return true;
+            }
+          }
+        }
+        return false;
+      },
+    },
+
+    // 지역 관련
+    region: {
+      keywords: [
+        "서울",
+        "부산",
+        "대구",
+        "인천",
+        "광주",
+        "대전",
+        "울산",
+        "세종",
+        "경기",
+        "강원",
+        "충북",
+        "충남",
+        "전북",
+        "전남",
+        "경북",
+        "경남",
+        "제주",
+        "호남",
+        "영남",
+        "수도권",
+        "강남",
+        "강북",
+      ],
+      check: (value) => {
+        const valueLower = String(value).toLowerCase();
+        if (
+          queryLower.includes("호남") &&
+          (valueLower.includes("전북") ||
+            valueLower.includes("전남") ||
+            valueLower.includes("광주"))
+        ) {
+          return true;
+        }
+        if (
+          queryLower.includes("영남") &&
+          (valueLower.includes("경북") ||
+            valueLower.includes("경남") ||
+            valueLower.includes("부산") ||
+            valueLower.includes("대구") ||
+            valueLower.includes("울산"))
+        ) {
+          return true;
+        }
+        if (
+          queryLower.includes("수도권") &&
+          (valueLower.includes("서울") ||
+            valueLower.includes("경기") ||
+            valueLower.includes("인천"))
+        ) {
+          return true;
+        }
+        return categoryKeywords.region.keywords.some(
+          (k) => queryLower.includes(k) && valueLower.includes(k)
+        );
+      },
+    },
+
+    // 차량 관련
+    vehicle: {
+      keywords: ["차량", "자동차", "차", "승용차", "운전", "자가용", "보유"],
+      check: (value) => {
+        return categoryKeywords.vehicle.keywords.some((k) =>
+          queryLower.includes(k)
+        );
+      },
+    },
+
+    // 흡연 관련
+    smoking: {
+      keywords: ["흡연", "담배", "피우", "연초"],
+      check: (value) => {
+        return categoryKeywords.smoking.keywords.some((k) =>
+          queryLower.includes(k)
+        );
+      },
+    },
+
+    // 음주 관련
+    drinking: {
+      keywords: ["음주", "술", "음용", "마시", "주류", "알코올"],
+      check: (value) => {
+        return categoryKeywords.drinking.keywords.some((k) =>
+          queryLower.includes(k)
+        );
+      },
+    },
+
+    // 소득 관련
+    income: {
+      keywords: [
+        "소득",
+        "연봉",
+        "월급",
+        "수입",
+        "저소득",
+        "고소득",
+        "중소득",
+        "100만원",
+        "200만원",
+        "300만원",
+        "400만원",
+        "500만원",
+        "600만원",
+        "700만원",
+        "800만원",
+        "900만원",
+        "1000만원",
+        "백만원",
+        "천만원",
+      ],
+      check: (value, type = "personal") => {
+        const valueLower = String(value).toLowerCase();
+
+        // "가구소득" 키워드가 있으면 가구소득만 하이라이트
+        if (
+          queryLower.includes("가구소득") ||
+          queryLower.includes("가구 소득")
+        ) {
+          return type === "household";
+        }
+
+        // "개인소득" 키워드가 있으면 개인소득만 하이라이트
+        if (
+          queryLower.includes("개인소득") ||
+          queryLower.includes("개인 소득")
+        ) {
+          return type === "personal";
+        }
+
+        // 고소득/저소득/중소득 처리
+        if (queryLower.includes("고소득")) {
+          const incomeMatch = valueLower.match(/(\d+)만원/);
+          if (incomeMatch) {
+            const amount = parseInt(incomeMatch[1]);
+            return amount >= 400 && type === "personal";
+          }
+        }
+
+        if (queryLower.includes("저소득")) {
+          const incomeMatch = valueLower.match(/(\d+)만원/);
+          if (incomeMatch) {
+            const amount = parseInt(incomeMatch[1]);
+            return amount <= 200 && type === "personal";
+          }
+        }
+
+        if (queryLower.includes("중소득")) {
+          const incomeMatch = valueLower.match(/(\d+)만원/);
+          if (incomeMatch) {
+            const amount = parseInt(incomeMatch[1]);
+            return amount > 200 && amount < 400 && type === "personal";
+          }
+        }
+
+        // 일반 소득 키워드는 개인소득만 하이라이트 (기본값)
+        const hasIncomeKeyword = categoryKeywords.income.keywords.some((k) =>
+          queryLower.includes(k)
+        );
+
+        return hasIncomeKeyword && type === "personal";
+      },
+    },
+
+    // 결혼여부 관련
+    maritalStatus: {
+      keywords: [
+        "기혼",
+        "미혼",
+        "결혼",
+        "배우자",
+        "독신",
+        "싱글",
+        "유부남",
+        "유부녀",
+        "총각",
+        "처녀",
+      ],
+      check: (value) => {
+        const valueLower = String(value).toLowerCase();
+        return categoryKeywords.maritalStatus.keywords.some(
+          (k) => queryLower.includes(k) && valueLower.includes(k)
+        );
+      },
+    },
+
+    // 생활패턴 관련 (칼럼명 기반)
+    lifestyle: {
+      patterns: {
+        체력_관리를_위한_활동: [
+          "운동",
+          "체력",
+          "헬스",
+          "요가",
+          "필라테스",
+          "피트니스",
+          "스포츠",
+        ],
+        이용_중인_OTT_서비스: [
+          "ott",
+          "넷플릭스",
+          "netflix",
+          "디즈니",
+          "disney",
+          "티빙",
+          "웨이브",
+          "쿠팡플레이",
+          "왓챠",
+          "스트리밍",
+        ],
+        반려동물을_키우거나_키웠던_경험: [
+          "반려동물",
+          "강아지",
+          "고양이",
+          "애완동물",
+          "펫",
+          "반려견",
+          "반려묘",
+        ],
+        사용해_본_AI_챗봇_서비스: [
+          "ai",
+          "챗봇",
+          "챗gpt",
+          "chatgpt",
+          "인공지능",
+          "gpt",
+          "클로드",
+          "claude",
+        ],
+        해외여행을_간다면_가고싶은_곳: ["여행", "해외여행", "여행지", "관광"],
+        스킨케어_제품을_구매할_때_중요하게_고려하는_요소: [
+          "스킨케어",
+          "화장품",
+          "미용",
+          "피부관리",
+          "피부",
+        ],
+      },
+      check: (columnName, value) => {
+        const patterns = categoryKeywords.lifestyle.patterns[columnName];
+        if (!patterns) return false;
+
+        return patterns.some((keyword) => queryLower.includes(keyword));
+      },
+    },
+  };
+
+  // 2. 각 필드별 하이라이트 여부 판단 함수
+  const shouldHighlight = {
+    age: () => {
+      return categoryKeywords.age.check(selectedPanel.age);
+    },
+
+    region: () => {
+      return (
+        categoryKeywords.region.check(selectedPanel.residence) ||
+        categoryKeywords.region.check(selectedPanel.district)
+      );
+    },
+
+    vehicle: () => {
+      return categoryKeywords.vehicle.check(null);
+    },
+
+    smoking: () => {
+      return categoryKeywords.smoking.check(null);
+    },
+
+    drinking: () => {
+      return categoryKeywords.drinking.check(null);
+    },
+
+    incomePersonal: (value) => {
+      return categoryKeywords.income.check(value, "personal");
+    },
+
+    incomeHousehold: (value) => {
+      return categoryKeywords.income.check(value, "household");
+    },
+
+    maritalStatus: (value) => {
+      return categoryKeywords.maritalStatus.check(value);
+    },
+
+    lifestyle: (columnName, value) => {
+      return categoryKeywords.lifestyle.check(columnName, value);
+    },
+
+    general: (value) => {
+      if (!value) return false;
+      const valueStr = String(value).toLowerCase();
+
+      // 불용어 목록 추가
+      const stopwords = [
+        "이상",
+        "이하",
+        "미만",
+        "초과",
+        "월",
+        "년",
+        "약",
+        "패널",
+        "정도",
+      ];
+
+      const keywords = queryLower
+        .split(/[\s,]+/)
+        .filter((k) => k.length >= 2 && !stopwords.includes(k));
+
+      return keywords.some((keyword) => valueStr.includes(keyword));
+    },
+  };
+
+  // 3. 생활패턴 매칭 개수 계산
+  const getMatchingLifestyleCount = () => {
+    if (!selectedPanel.lifestylePatterns) return 0;
+
+    return Object.entries(selectedPanel.lifestylePatterns).filter(
+      ([key, value]) =>
+        value !== "무응답" && shouldHighlight.lifestyle(key, value)
+    ).length;
+  };
+
+  const matchingLifestyleCount = getMatchingLifestyleCount();
+
+  const InfoRow = ({ label, value, highlight = false }) => (
+    <div
+      className={`flex py-2 border-b border-gray-100 last:border-b-0 transition-all ${
+        highlight
+          ? "bg-yellow-50 border-l-4 border-l-yellow-400 pl-2 -ml-2"
+          : ""
+      }`}
+    >
+      <span className="w-1/3 text-base font-semibold text-gray-700 flex items-center gap-1">
+        {highlight && <Search className="w-4 h-4 text-yellow-600" />}
+        {label}
+      </span>
+      <span
+        className={`w-2/3 text-base ${
+          highlight ? "font-semibold text-gray-900" : "text-gray-900"
+        }`}
+      >
+        {value || "무응답"}
+      </span>
+    </div>
+  );
+
+  // ArrayInfoRow 컴포넌트를 태그 스타일로 변경
+  const ArrayInfoRow = ({
+    label,
+    values,
+    highlight = false,
+    useTagStyle = false,
+  }) => {
+    const [showAll, setShowAll] = useState(false);
+
+    const INITIAL_SHOW_COUNT = 6;
+    const displayValues = showAll
+      ? values
+      : values?.slice(0, INITIAL_SHOW_COUNT);
+    const hasMore = values && values.length > INITIAL_SHOW_COUNT;
+
+    return (
+      <div
+        className={`py-3 border-b border-gray-100 last:border-b-0 transition-all ${
+          highlight
+            ? "bg-yellow-50 border-l-4 border-l-yellow-400 pl-2 -ml-2"
+            : ""
+        }`}
+      >
+        <div className="flex items-center justify-between mb-3">
+          <span className="text-base font-semibold text-gray-700 flex items-center gap-1">
+            {highlight && <Search className="w-4 h-4 text-yellow-600" />}
+            {label}
+          </span>
+          {values && values.length > 0 && (
+            <span className="text-sm px-3 py-1 bg-indigo-50 border border-indigo-200 text-indigo-600 rounded-full font-medium">
+              {values.length}개
+            </span>
+          )}
+        </div>
+
+        <div className="text-base text-gray-900">
+          {values && values.length > 0 ? (
+            useTagStyle ? (
+              <div>
+                <div className="flex flex-wrap gap-2">
+                  {displayValues.map((item, idx) => (
+                    <span
+                      key={idx}
+                      className={`inline-flex items-center px-4 py-2 rounded-lg text-base font-medium border-2 ${
+                        highlight
+                          ? "bg-yellow-50 border-yellow-400 text-yellow-900"
+                          : "bg-white border-indigo-300 text-gray-900 shadow-sm"
+                      }`}
+                    >
+                      {item}
+                    </span>
+                  ))}
+                </div>
+
+                {hasMore && (
+                  <button
+                    onClick={() => setShowAll(!showAll)}
+                    className="mt-3 text-base text-indigo-600 hover:text-indigo-800 font-semibold flex items-center gap-1"
+                  >
+                    {showAll ? (
+                      <>
+                        <ChevronUp className="w-5 h-5" />
+                        접기
+                      </>
+                    ) : (
+                      <>
+                        <ChevronDown className="w-5 h-5" />
+                        {values.length - INITIAL_SHOW_COUNT}개 더보기
+                      </>
+                    )}
+                  </button>
+                )}
+              </div>
+            ) : (
+              <ul className="list-disc list-inside">
+                {values.map((item, idx) => (
+                  <li key={idx} className={highlight ? "font-semibold" : ""}>
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            )
+          ) : (
+            <span className="text-gray-400">무응답</span>
+          )}
+        </div>
+      </div>
+    );
+  };
+
+  const reliabilityColor =
+    selectedPanel.reliability >= 75
+      ? "bg-green-100 text-green-800 border-green-300"
+      : selectedPanel.reliability >= 50
+      ? "bg-yellow-100 text-yellow-800 border-yellow-300"
+      : "bg-red-100 text-red-800 border-red-300";
+
   return (
-    <main className="flex-1 overflow-auto">
-      <div className="p-6 space-y-6">
-        <div className="bg-white border border-gray-300 rounded-lg p-6 shadow-md">
-          <div className="flex items-start justify-between mb-4">
+    <div className="bg-white rounded-lg border-2 border-indigo-200 shadow-sm">
+      {/* 헤더 - 클릭하면 전체 열기/닫기 */}
+      <div
+        className="p-4 bg-indigo-50 border-b-2 border-indigo-200 cursor-pointer hover:bg-indigo-100 transition-colors"
+        onClick={() => setIsExpanded(!isExpanded)}
+      >
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <User className="w-6 h-6 text-indigo-600" />
             <div>
-              <h2 className="text-3xl mb-2">{selectedPanel.id}</h2>
-              <p className="text-gray-600">
-                {selectedPanel.age}세 · {selectedPanel.gender}
-              </p>
+              <h3 className="text-lg font-bold text-indigo-900">
+                패널 ID: {selectedPanel.mbSn}
+              </h3>
             </div>
-            <div className="flex flex-col items-end gap-1">
-              <span className="text-xs text-gray-600">신뢰도</span>
-              <span
-                className={`text-2xl ${
-                  selectedPanel.reliability >= 75
-                    ? "text-green-600"
-                    : selectedPanel.reliability >= 50
-                    ? "text-yellow-600"
-                    : selectedPanel.reliability >= 25
-                    ? "text-orange-600"
-                    : "text-red-600"
-                }`}
-              >
+          </div>
+
+          <div className="flex items-center gap-3">
+            <div
+              className={`px-4 py-2 rounded-full border-2 ${reliabilityColor} flex items-center gap-2`}
+            >
+              <Award className="w-5 h-5" />
+              <span className="font-bold text-lg">
                 {selectedPanel.reliability}%
               </span>
             </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div className="flex items-center gap-3 p-3 bg-gray-100 rounded-lg">
-              <MapPin className="w-5 h-5 text-indigo-600" />
-              <div>
-                <p className="text-xs text-gray-600">거주지</p>
-                <p>{selectedPanel.residence}</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-3 p-3 bg-gray-100 rounded-lg">
-              <Briefcase className="w-5 h-5 text-indigo-600" />
-              <div>
-                <p className="text-xs text-gray-600">직업</p>
-                <p>{selectedPanel.occupation}</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-3 p-3 bg-gray-100 rounded-lg">
-              <DollarSign className="w-5 h-5 text-indigo-600" />
-              <div>
-                <p className="text-xs text-gray-600">소득</p>
-                <p>{selectedPanel.income.toLocaleString()}만원</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-3 p-3 bg-gray-100 rounded-lg">
-              <Car className="w-5 h-5 text-indigo-600" />
-              <div>
-                <p className="text-xs text-gray-600">차량</p>
-                <p>
-                  {selectedPanel.vehicle.hasVehicle
-                    ? selectedPanel.vehicle.type
-                    : "없음"}
-                </p>
-              </div>
-            </div>
-          </div>
-
-          {/* ▼▼ AI 한 줄 요약 ▼▼ */}
-          <div className="mt-6 pt-6 border-t border-gray-200">
-            <div className=" items-center justify-between mb-3">
-              <div className="flex items-center gap-2">
-                <Star className="w-8 h-8 text-yellow-400" />
-                <h3 className="text-xl font-semibold">고객 성향</h3>
-                <ChevronDown
-                  className={`w-6 h-6 text-gray-500 transition-transform ${
-                    openCharac ? "rotate-180" : ""
-                  }`}
-                  onClick={() => setOpenCharac(() => !openCharac)}
-                />
-              </div>
-              {openCharac && (
-                <div className="bg-yellow-50 m-2 p-2 rounded-lg border border-yellow-200 shadow-lg">
-                  {/* 목업 데이터가 아닐 경우 selectedPanel.고객성향문장 */}{" "}
-                  {/* 요약 본문 */}
-                  <div className="p-3 space-y-3 text-gray-700 font-bold leading-relaxed">
-                    <p>
-                      <span className="font-bold text-yellow-800">
-                        주요연령대:
-                      </span>{" "}
-                      40대 후반, 장년층
-                    </p>
-                    <p>
-                      <span className="font-bold text-yellow-800">
-                        지역특성:
-                      </span>{" "}
-                      경기도 성남시 거주, 수도권 중산층 주거지역 거주자.
-                    </p>
-                    <p>
-                      <span className="font-bold text-yellow-800">
-                        직업경향:
-                      </span>{" "}
-                      건설·건축 분야의 기능직, 월 400-499만원의 안정적인
-                      개인소득 가진 전문 기술직 종사자.
-                    </p>
-                    <p>
-                      <span className="font-bold text-yellow-800">
-                        생활패턴:
-                      </span>{" "}
-                      4인 가족의 기혼 가장, 다양한 첨단 전자기기와 차량을 보유.
-                      소주, 맥주 등 다양한 주류를 즐기는 현대적 소비 성향을
-                      보임.
-                    </p>
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* ▼▼ 신뢰도 감점 사유 섹션 ▼▼ */}
-          {selectedPanel.reliability < 100 ? (
-            <div className="mt-6 pt-6 border-t border-gray-200">
-              <div className=" items-center justify-between mb-3">
-                <div className="flex items-center gap-2">
-                  <AlertTriangle className="w-8 h-8 text-amber-600" />
-                  <h3 className="text-xl font-semibold">신뢰도 감점 사유</h3>
-                  <ChevronDown
-                    className={`w-6 h-6 text-gray-500 transition-transform ${
-                      openSubtract ? "rotate-180" : ""
-                    }`}
-                    onClick={() => setOpenSubtract(() => !openSubtract)}
-                  />
-                </div>
-                {openSubtract && (
-                  <div className="bg-amber-100 m-2 p-2 rounded-lg border border-amber-200 shadow-lg">
-                    {/* 목업 데이터가 아닐 경우 selectedPanel.신뢰도감점사유 */}
-
-                    <div className="space-y-3">
-                      {/* 감점 포인트 라인 */}
-                      <div className="flex items-center justify-between">
-                        <div className="inline-flex items-center gap-2 rounded-full bg-white/70 px-3 py-1 border border-amber-200">
-                          <span className="text-xs font-medium text-amber-700">
-                            감점 포인트
-                          </span>
-                        </div>
-                        <div className="text-2xl font-extrabold tracking-tight text-amber-700">
-                          -{100 - selectedPanel.reliability}점
-                        </div>
-                      </div>
-
-                      {/* 사유 요약 카드 */}
-                      <div className="rounded-xl bg-white border border-amber-200 p-4 shadow-sm">
-                        <p className="leading-relaxed text-amber-900">
-                          <span className="mr-2 inline-flex items-center rounded-md bg-amber-100 px-2 py-0.5 font-semibold text-amber-800">
-                            사유 요약
-                          </span>
-                          본 패널은 2010년생으로, 만 16세 미성년자임. 음주
-                          경험과 차량 소유에 응답했음. 일반적이지 않음.
-                        </p>
-                        {/* 핵심 포인트 칩 */}{" "}
-                        {/*이부분은 나중에 감점 사유 요약해달라 할때 감점 키워드 배열로 받아와 maps 사용하면 될듯*/}
-                        <div className="mt-3 flex flex-wrap gap-2">
-                          <span className="text-xs px-2 py-1 rounded-full bg-amber-50 border border-amber-200 text-amber-800">
-                            2010년생
-                          </span>
-                          <span className="text-xs px-2 py-1 rounded-full bg-amber-50 border border-amber-200 text-amber-800">
-                            만 16세
-                          </span>
-                          <span className="text-xs px-2 py-1 rounded-full bg-amber-50 border border-amber-200 text-amber-800">
-                            음주 응답
-                          </span>
-                          <span className="text-xs px-2 py-1 rounded-full bg-amber-50 border border-amber-200 text-amber-800">
-                            차량 소유 응답
-                          </span>
-                          <span className="text-xs px-2 py-1 rounded-full bg-amber-50 border border-amber-200 text-amber-800">
-                            비일반적 패턴
-                          </span>
-                        </div>
-                        {/* 시각 보조: 미니 진행바(선택) */}
-                        <div className="mt-4">
-                          <div className="h-1.5 w-full rounded-full bg-green-500 overflow-hidden">
-                            <div
-                              className="h-full bg-gradient-to-r from-amber-400 to-red-500"
-                              style={{
-                                width: `${100 - selectedPanel.reliability}%`,
-                              }}
-                              title={`감점 ${
-                                100 - selectedPanel.reliability
-                              }점`}
-                            />
-                          </div>
-                          <div className="mt-1 flex justify-between text-[10px] text-gray-500">
-                            <span>0점</span>
-                            <span>
-                              감점 {100 - selectedPanel.reliability}점
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-          ) : (
-            // 신뢰도가 만점인 경우
-            <div className="flex items-center gap-2 mt-6 pt-6 border-t border-gray-200">
-              <Smile className="w-8 h-8 text-green-600" />
-              <h3 className="text-xl font-semibold">신뢰도 만족</h3>
-              <p className="text-green-600 font-semibold">100%</p>
-            </div>
-          )}
-
-          {/* ▼▼ 기타 추가 정보 섹션 ▼▼ */}
-          <div className="mt-6 pt-6 border-t border-gray-200">
-            <div className=" items-center justify-between mb-3">
-              <div className="flex items-center gap-2">
-                <ListFilterPlus className="w-8 h-8 text-stone-400" />
-                <h3 className="text-xl font-semibold">기타 추가 정보</h3>
-                <ChevronDown
-                  className={`w-6 h-6 text-gray-500 transition-transform ${
-                    openAddInfo ? "rotate-180" : ""
-                  }`}
-                  onClick={() => setOpenAddInfo(() => !openAddInfo)}
-                />
-              </div>
-              {openAddInfo && (
-                <div className="bg-stone-100 m-2 p-2 rounded-lg border border-stone-300 shadow-lg">
-                  {/* 목업 데이터가 아닐 경우 selectedPanel.기타추가정보 */}{" "}
-                  <div className="rounded-xl border border-stone-300 bg-stone-50 p-4 sm:p-5 shadow-sm">
-                    {/* 상단 요약 배지들 */}
-                    <p className="mb-2 font-bold">설문 카테고리별 분류</p>
-                    {/* 상세 정보 그리드 */}
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                      {/* 인구 통계 특성 */}
-                      <div className="rounded-lg bg-white border border-stone-200 p-4">
-                        <h4 className="mb-3 text-sm font-semibold text-stone-700">
-                          인구 통계 특성
-                        </h4>
-                        <dl className="space-y-2 text-sm text-stone-700">
-                          <div className="flex justify-between">
-                            <dt className="text-stone-500">결혼여부</dt>
-                            <dd className="font-medium">기혼</dd>
-                          </div>
-                          <div className="flex justify-between">
-                            <dt className="text-stone-500">자녀수</dt>
-                            <dd className="font-medium">1명</dd>
-                          </div>
-                          <div className="flex justify-between">
-                            <dt className="text-stone-500">가족수</dt>
-                            <dd className="font-medium">3명</dd>
-                          </div>
-                          <div className="flex justify-between">
-                            <dt className="text-stone-500">최종학력</dt>
-                            <dd className="font-medium">대학교 졸업</dd>
-                          </div>
-                        </dl>
-                      </div>
-
-                      {/* 소비 성향 */}
-                      <div className="rounded-lg bg-white border border-stone-200 p-4">
-                        <h4 className="mb-3 text-sm font-semibold text-stone-700">
-                          소비 성향
-                        </h4>
-                        <div className="flex flex-wrap gap-2 mb-3">
-                          {["로봇청소기", "건조기"].map((d) => (
-                            <span
-                              key={d}
-                              className="text-xs px-2 py-1 rounded-full bg-stone-100 border border-stone-200 text-stone-800"
-                            >
-                              {d}
-                            </span>
-                          ))}
-                        </div>
-                        <div className="text-sm text-stone-700 space-y-1">
-                          <div className="flex justify-between">
-                            <span className="text-stone-500">
-                              휴대폰 브랜드
-                            </span>
-                            <span className="font-medium">삼성</span>
-                          </div>
-                          <div className="flex justify-between">
-                            <span className="text-stone-500">
-                              휴대폰 모델명
-                            </span>
-                            <span className="font-medium">갤럭시 S25</span>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* 생활 패턴 */}
-                      <div className="rounded-lg bg-white border border-stone-200 p-4">
-                        <h4 className="mb-3 text-sm font-semibold text-stone-700">
-                          생활 패턴
-                        </h4>
-                        <div className="flex flex-col gap-2 text-sm">
-                          <div className="flex items-center justify-between">
-                            <span className="text-stone-500">흡연여부</span>
-                            <span className="inline-flex items-center gap-2">
-                              <span className="h-2 w-2 rounded-full bg-stone-300" />
-                              <span className="font-medium text-stone-700">
-                                무응답
-                              </span>
-                            </span>
-                          </div>
-                          <div className="flex items-center justify-between">
-                            <span className="text-stone-500">음주여부</span>
-                            <span className="inline-flex items-center gap-2">
-                              <span className="h-2 w-2 rounded-full bg-stone-300" />
-                              <span className="font-medium text-stone-700">
-                                무응답
-                              </span>
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+            {/* 전체 열기/닫기 버튼 */}
+            <div className="p-2 rounded-full bg-indigo-200 hover:bg-indigo-300 transition-colors">
+              {isExpanded ? (
+                <ChevronUp className="w-6 h-6 text-indigo-700" />
+              ) : (
+                <ChevronDown className="w-6 h-6 text-indigo-700" />
               )}
             </div>
           </div>
         </div>
+
+        {/* 신뢰도 감점 사유 - 헤더에 포함 */}
+        {selectedPanel.reliabilityReasons &&
+          selectedPanel.reliabilityReasons.length > 0 && (
+            <div className="mt-3 p-3 bg-red-50 rounded-lg border border-red-200">
+              <div className="flex items-center gap-2 mb-2">
+                <AlertTriangle className="w-4 h-4 text-red-600" />
+                <span className="font-semibold text-sm text-red-700">
+                  신뢰도 감점 사유
+                </span>
+              </div>
+              <ul className="list-disc list-inside text-sm text-red-600 space-y-1">
+                {selectedPanel.reliabilityReasons.map((reason, idx) => (
+                  <li key={idx}>{reason}</li>
+                ))}
+              </ul>
+            </div>
+          )}
       </div>
-    </main>
+
+      {/* 상세 정보 - isExpanded가 true일 때만 표시 */}
+      {isExpanded && (
+        <>
+          {/* 기본 정보 */}
+          <CollapsibleSection title="기본 정보" icon="📋" defaultOpen={true}>
+            <InfoRow
+              label="성별"
+              value={selectedPanel.gender}
+              highlight={shouldHighlight.general(selectedPanel.gender)}
+            />
+            <InfoRow
+              label="나이"
+              value={`${selectedPanel.age}세`}
+              highlight={shouldHighlight.age()}
+            />
+            <InfoRow
+              label="출생년도"
+              value={`${selectedPanel.birthYear}년`}
+              highlight={shouldHighlight.general(`${selectedPanel.birthYear}`)}
+            />
+            <InfoRow
+              label="거주지"
+              value={`${selectedPanel.residence} ${selectedPanel.district}`}
+              highlight={shouldHighlight.region()}
+            />
+            <InfoRow
+              label="결혼여부"
+              value={selectedPanel.maritalStatus}
+              highlight={shouldHighlight.maritalStatus(
+                selectedPanel.maritalStatus
+              )}
+            />
+            <InfoRow
+              label="자녀수"
+              value={`${selectedPanel.children}명`}
+              highlight={shouldHighlight.general(`${selectedPanel.children}`)}
+            />
+            <InfoRow
+              label="가족수"
+              value={selectedPanel.familySize}
+              highlight={shouldHighlight.general(selectedPanel.familySize)}
+            />
+          </CollapsibleSection>
+
+          {/* 직업 및 소득 정보 */}
+          <CollapsibleSection title="직업 및 소득" icon="💼" defaultOpen={true}>
+            <InfoRow
+              label="최종학력"
+              value={selectedPanel.education}
+              highlight={shouldHighlight.general(selectedPanel.education)}
+            />
+            <InfoRow
+              label="직업"
+              value={selectedPanel.job}
+              highlight={shouldHighlight.general(selectedPanel.job)}
+            />
+            <InfoRow
+              label="직무"
+              value={selectedPanel.role}
+              highlight={shouldHighlight.general(selectedPanel.role)}
+            />
+            <InfoRow
+              label="개인소득"
+              value={selectedPanel.personalIncome}
+              highlight={shouldHighlight.incomePersonal(
+                selectedPanel.personalIncome
+              )}
+            />
+            <InfoRow
+              label="가구소득"
+              value={selectedPanel.householdIncome}
+              highlight={shouldHighlight.incomeHousehold(
+                selectedPanel.householdIncome
+              )}
+            />
+          </CollapsibleSection>
+
+          {/* 소유 정보 */}
+          <CollapsibleSection title="소유 정보" icon="📱" defaultOpen={true}>
+            <InfoRow
+              label="휴대폰 브랜드"
+              value={selectedPanel.phoneBrand}
+              highlight={shouldHighlight.general(selectedPanel.phoneBrand)}
+            />
+            <InfoRow
+              label="휴대폰 모델"
+              value={selectedPanel.phoneModel}
+              highlight={shouldHighlight.general(selectedPanel.phoneModel)}
+            />
+            <InfoRow
+              label="차량 보유"
+              value={selectedPanel.carOwnership}
+              highlight={shouldHighlight.vehicle()}
+            />
+            <InfoRow
+              label="자동차 제조사"
+              value={selectedPanel.carBrand}
+              highlight={false}
+            />
+            <InfoRow
+              label="자동차 모델"
+              value={selectedPanel.carModel}
+              highlight={false}
+            />
+          </CollapsibleSection>
+
+          {/* 생활 습관 */}
+          <CollapsibleSection title="생활 습관" icon="🚬" defaultOpen={true}>
+            <ArrayInfoRow
+              label="흡연경험"
+              values={selectedPanel.smokingExperience}
+              highlight={shouldHighlight.smoking()}
+              useTagStyle={true}
+            />
+            <ArrayInfoRow
+              label="음주경험"
+              values={selectedPanel.drinkingExperience}
+              highlight={shouldHighlight.drinking()}
+              useTagStyle={true}
+            />
+          </CollapsibleSection>
+
+          {/* 보유 제품 */}
+          <CollapsibleSection title="보유 제품" icon="🛍️" defaultOpen={false}>
+            <ArrayInfoRow
+              label="보유제품"
+              values={selectedPanel.ownedProducts}
+              highlight={false}
+              useTagStyle={true} // 태그 스타일 적용
+            />
+          </CollapsibleSection>
+
+          {/* 생활 패턴 정보 */}
+          {selectedPanel.lifestylePatterns &&
+            Object.keys(selectedPanel.lifestylePatterns).length > 0 && (
+              <CollapsibleSection
+                title={
+                  <div className="flex items-center justify-between w-full pr-8">
+                    <span>생활 패턴</span>
+                    {matchingLifestyleCount > 0 && (
+                      <span className="px-3 py-1 bg-yellow-100 text-yellow-800 text-xs font-bold rounded-full border border-yellow-300">
+                        {matchingLifestyleCount}개 매칭
+                      </span>
+                    )}
+                  </div>
+                }
+                icon="🌟"
+                defaultOpen={matchingLifestyleCount > 0}
+              >
+                {Object.entries(selectedPanel.lifestylePatterns).map(
+                  ([key, value]) =>
+                    value !== "무응답" && (
+                      <InfoRow
+                        key={key}
+                        label={key.replace(/_/g, " ")}
+                        value={value}
+                        highlight={shouldHighlight.lifestyle(key, value)}
+                      />
+                    )
+                )}
+              </CollapsibleSection>
+            )}
+        </>
+      )}
+    </div>
   );
 }
 
-export function TotalInfo({ panels = [] }) {
-  // 패널 총원
-  const panelsCnt = panels.length;
+// 전체 패널 정보 요약 컴포넌트
+export function TotalInfo({ panels }) {
+  if (!panels || panels.length === 0) {
+    return (
+      <div className="p-6 text-center text-gray-500 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300">
+        <p>검색된 패널이 없습니다</p>
+      </div>
+    );
+  }
 
-  // 평균 연령
-  const panelsAge =
-    panelsCnt > 0
-      ? (panels.reduce((sum, p) => sum + (p.age || 0), 0) / panelsCnt).toFixed(
-          1
-        )
-      : 0;
-
-  // 평균 소득
-  const panelsInco =
-    panelsCnt > 0
-      ? (
-          panels.reduce((sum, p) => sum + (p.income || 0), 0) / panelsCnt
-        ).toFixed(1)
-      : 0;
-
-  // 최빈 거주지 (가장 많이 사는 지역)
-  const residenceCount = panels.reduce((acc, p) => {
-    if (!p.residence) return acc;
-    acc[p.residence] = (acc[p.residence] || 0) + 1;
+  // 가장 많은 거주지역 계산 (무응답 제외 우선)
+  const residenceDistribution = panels.reduce((acc, p) => {
+    const residence = p.residence || "무응답";
+    acc[residence] = (acc[residence] || 0) + 1;
     return acc;
   }, {});
 
-  const panelsHome =
-    Object.keys(residenceCount).length > 0
-      ? Object.entries(residenceCount).sort((a, b) => b[1] - a[1])[0][0]
-      : "-";
+  const residenceWithoutNoResponse = Object.entries(residenceDistribution)
+    .filter(([key]) => key !== "무응답")
+    .sort((a, b) => b[1] - a[1]);
+
+  const mostCommonResidence =
+    residenceWithoutNoResponse.length > 0
+      ? residenceWithoutNoResponse[0]
+      : ["무응답", residenceDistribution["무응답"] || 0];
+
+  // 가장 많은 소득 계산 (무응답 제외 우선)
+  const incomeDistribution = panels.reduce((acc, p) => {
+    const income = p.personalIncome || "무응답";
+    acc[income] = (acc[income] || 0) + 1;
+    return acc;
+  }, {});
+
+  const incomeWithoutNoResponse = Object.entries(incomeDistribution)
+    .filter(([key]) => key !== "무응답")
+    .sort((a, b) => b[1] - a[1]);
+
+  // 무응답 제외 데이터가 있으면 그 중 1위, 없으면 무응답 표시
+  const mostCommonIncome =
+    incomeWithoutNoResponse.length > 0
+      ? incomeWithoutNoResponse[0]
+      : ["무응답", incomeDistribution["무응답"] || 0];
+
+  const avgAge =
+    panels.reduce((sum, p) => sum + (p.age || 0), 0) / panels.length;
 
   return (
-    <div className="flex justify-between items-center bg-gradient-to-r from-indigo-50 to-purple-50 border border-indigo-200 rounded-2xl p-6 m-6 shadow-md">
-      {/* 전체 패널 수 */}
-      <div className="flex flex-col items-center flex-1">
-        <div className="flex items-center gap-2 text-indigo-600 mb-2">
-          <Users className="w-6 h-6" />
-          <p className="font-semibold text-lg">전체 패널</p>
+    <div className="bg-white rounded-lg border-2 border-indigo-200 shadow-sm p-6">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        {/* 총 패널 수 */}
+        <div className="p-5 bg-indigo-100 rounded-lg border border-indigo-200">
+          <p className="text-base text-gray-700 mb-2 font-medium">총 패널 수</p>
+          <p className="text-4xl font-bold text-indigo-900">
+            {panels.length}명
+          </p>
         </div>
-        <p className="text-3xl font-bold text-gray-800">{panelsCnt}명</p>
-      </div>
 
-      {/* 평균 연령 */}
-      <div className="flex flex-col items-center flex-1 border-l border-indigo-100">
-        <div className="flex items-center gap-2 text-rose-700 mb-2">
-          <User className="w-6 h-6" />
-          <p className="font-semibold text-lg">평균 연령</p>
+        {/* 가장 많은 거주지역 */}
+        <div className="p-5 bg-purple-200 rounded-lg border border-purple-200">
+          <p className="text-base text-gray-700 mb-2 font-medium">
+            가장 많은 거주지역
+          </p>
+          <p className="text-3xl font-bold text-purple-900">
+            {mostCommonResidence[0]}
+          </p>
+          <p className="text-sm text-gray-600 mt-1 font-semibold">
+            {mostCommonResidence[1]}명
+          </p>
         </div>
-        <p className="text-3xl font-bold text-gray-800">{panelsAge}세</p>
-      </div>
 
-      {/* 거주지 */}
-      <div className="flex flex-col items-center flex-1 border-l border-indigo-100">
-        <div className="flex items-center gap-2 text-yellow-600 mb-2">
-          <MapPin className="w-6 h-6" />
-          <p className="font-semibold text-lg">주요 거주지</p>
+        {/* 평균 나이 */}
+        <div className="p-5 bg-blue-100 rounded-lg border border-blue-200">
+          <p className="text-base text-gray-700 mb-2 font-medium">평균 나이</p>
+          <p className="text-4xl font-bold text-blue-900">
+            {avgAge.toFixed(1)}세
+          </p>
         </div>
-        <p className="text-3xl font-bold text-gray-800">{panelsHome}</p>
-      </div>
 
-      {/* 평균 소득 */}
-      <div className="flex flex-col items-center flex-1 border-l border-indigo-100">
-        <div className="flex items-center gap-2 text-green-600 mb-2">
-          <DollarSign className="w-6 h-6" />
-          <p className="font-semibold text-lg">평균 소득</p>
+        {/* 가장 많은 소득 */}
+        <div className="p-5 bg-purple-100 rounded-lg border border-purple-200">
+          <p className="text-base text-gray-700 mb-2 font-medium">
+            가장 많은 소득
+          </p>
+          <div className="text-lg font-bold text-purple-900">
+            {mostCommonIncome[0]}
+          </div>
+          <p className="text-sm text-gray-600 mt-1 font-semibold">
+            {mostCommonIncome[1]}명
+          </p>
         </div>
-        <p className="text-3xl font-bold text-gray-800">{panelsInco}만원</p>
       </div>
     </div>
   );
