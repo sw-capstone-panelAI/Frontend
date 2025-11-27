@@ -169,7 +169,7 @@ function MainPage() {
                       selectedModel === "fast" ? "drop-shadow-sm" : ""
                     }`}
                   />
-                  <span className="text-sm">Fast model v1.0</span>
+                  <span className="text-sm">Fast model</span>
                 </button>
                 <button
                   onClick={() => handleModelChange("deep")}
@@ -184,7 +184,7 @@ function MainPage() {
                       selectedModel === "deep" ? "drop-shadow-sm" : ""
                     }`}
                   />
-                  <span className="text-sm">DeepSearch model v1.0</span>
+                  <span className="text-sm">DeepSearch model</span>
                 </button>
               </div>
 
