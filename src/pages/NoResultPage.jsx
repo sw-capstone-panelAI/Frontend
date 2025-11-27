@@ -1,4 +1,3 @@
-// NoResultPage.jsx
 import { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { SearchX, Sparkles, Users, TrendingUp } from "lucide-react";
@@ -10,6 +9,7 @@ export default function NoResultPage() {
   const location = useLocation();
   const navigate = useNavigate();
   const originalQuery = location.state?.query || "";
+  const searchModel = location.state?.model || "fast";
   const [query, setQuery] = useState("");
 
   // 애니메이션 상태
@@ -22,7 +22,6 @@ export default function NoResultPage() {
   const [showTip, setShowTip] = useState(false);
 
   useEffect(() => {
-    // 순차적 애니메이션 타이밍
     const timers = [
       setTimeout(() => setShowIcon(true), 200),
       setTimeout(() => setShowTitle(true), 400),
@@ -41,16 +40,20 @@ export default function NoResultPage() {
   const onSearch = () => {
     if (!query.trim()) return;
 
-    // 히스토리에 추가 (중복 제거)
     const savedHistory = localStorage.getItem("searchHistory");
     const searchHistory = savedHistory ? JSON.parse(savedHistory) : [];
     const newHistory = [
       query,
       ...searchHistory.filter((h) => h !== query),
-    ].slice(0, 10); // 최대 10개
+    ].slice(0, 10);
     localStorage.setItem("searchHistory", JSON.stringify(newHistory));
 
-    navigate(routes.search, { state: { query } });
+    navigate(routes.search, {
+      state: {
+        query,
+        model: searchModel, // 검색 모델 유지
+      },
+    });
   };
 
   const suggestedSearches = [
@@ -75,7 +78,6 @@ export default function NoResultPage() {
   ];
 
   const handleSuggestionClick = (suggestedQuery) => {
-    // 히스토리에 추가 (중복 제거)
     const savedHistory = localStorage.getItem("searchHistory");
     const searchHistory = savedHistory ? JSON.parse(savedHistory) : [];
     const newHistory = [
@@ -84,7 +86,12 @@ export default function NoResultPage() {
     ].slice(0, 10);
     localStorage.setItem("searchHistory", JSON.stringify(newHistory));
 
-    navigate(routes.search, { state: { query: suggestedQuery } });
+    navigate(routes.search, {
+      state: {
+        query: suggestedQuery,
+        model: searchModel, // 검색 모델 유지
+      },
+    });
   };
 
   return (
@@ -95,7 +102,6 @@ export default function NoResultPage() {
 
       <main className="flex-1 flex flex-col items-center px-4 py-12">
         <div className="w-full max-w-4xl">
-          {/* 검색 결과 없음 아이콘 및 메시지 */}
           <div className="text-center mb-12">
             <div
               className={`inline-flex items-center justify-center w-24 h-24 bg-gray-100 rounded-full mb-6 transition-all duration-500 ${
@@ -138,7 +144,6 @@ export default function NoResultPage() {
             </div>
           </div>
 
-          {/* 새 검색어 입력 */}
           <div
             className={`mb-12 flex flex-col items-center transition-all duration-500 ${
               showSearch
@@ -157,7 +162,6 @@ export default function NoResultPage() {
             />
           </div>
 
-          {/* 추천 검색어 섹션 */}
           <div className="mb-8">
             <div
               className={`flex items-center justify-center gap-2 mb-6 transition-all duration-500 ${
@@ -224,7 +228,6 @@ export default function NoResultPage() {
             </div>
           </div>
 
-          {/* 검색 팁 */}
           <div
             className={`bg-gradient-to-r from-indigo-50 to-purple-50 rounded-xl p-6 border-2 border-indigo-200 transition-all duration-500 ${
               showTip ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
