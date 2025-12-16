@@ -1,16 +1,48 @@
-# React + Vite
+# PanelFinder Frontend
+[영상]
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## Preview
+[판넬]
 
-Currently, two official plugins are available:
+### Members
+<table width="50%" align="center">
+    <tr>
+        <td align="center"><b>LEAD/FE</b></td>
+        <td align="center"><b>FE/BE</b></td>
+        <td align="center"><b>AI/DATA</b></td>
+        <td align="center"><b>AI/DB</b></td>
+    </tr>
+    <tr>
+        <td align="center"><img src="https://avatars.githubusercontent.com/u/173050233?v=4" /></td>
+        <td align="center"><img src="https://avatars.githubusercontent.com/u/120187934?v=4" /></td>
+        <td align="center"><img src="https://avatars.githubusercontent.com/u/132585785?v=4"></td>
+        <td align="center"><img src="https://avatars.githubusercontent.com/u/203871424?v=4" /></td>
+    </tr>
+    <tr>
+        <td align="center"><b><a href="https://github.com/Aegis0424">안성민</a></b></td>
+        <td align="center"><b><a href="https://github.com/seungjin777">강승진</a></b></td>
+        <td align="center"><b><a href="https://github.com/iral304">송정은</a></b></td>
+        <td align="center"><b><a href="https://github.com/hyeon-414">우현</a></b></td> 
+    </tr>
+</table>
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Tech Stack
+[기술 스택]
 
-## React Compiler
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Getting Started
 
-## Expanding the ESLint configuration
+### Installation
+npm i
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+npm run dev
+
+
+## Project Structure
+[파일 구조]
+
+## Key Features
+[주요기능]
+
+## License
+이 프로젝트는 한성대학교 기업연계 SW캡스톤디자인 수업에서 진행되었습니다.
